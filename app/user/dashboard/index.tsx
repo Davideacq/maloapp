@@ -35,7 +35,7 @@ export default function UserDashboard() {
   const imageCards = [
     {
       image: require('../../../assets/images/travel.jpg'),
-      title: "Benvenuto, Mario Rossi",
+      title: "Suite Travel x Malo",
       subtitle: "Il tuo percorso di benessere psicologico",
       buttonText: "Profilo",
       onButtonPress: () => handleNavigation('/user/profile'),
