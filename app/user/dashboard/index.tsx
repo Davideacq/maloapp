@@ -42,7 +42,7 @@ export default function UserDashboard() {
     },
     {
       image: require('../../../assets/images/travel.jpg'),
-      title: "Azienda SpA",
+      title: "Hoover & Haier",
       subtitle: "Supporto psicologico aziendale",
       buttonText: "Info",
       onButtonPress: () => handleNavigation('/user/dashboard'),
