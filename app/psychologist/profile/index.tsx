@@ -12,6 +12,7 @@ import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../src/components/card';
 import { Dialog } from '../../../src/components/dialog';
 import { Input } from '../../../src/components/input';
+import { logoutUser } from '../../../src/utils/auth';
 
 export default function PsychologistProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -67,11 +68,14 @@ export default function PsychologistProfilePage() {
       'Sei sicuro di voler uscire?',
       [
         { text: 'Annulla', style: 'cancel' },
-        { 
-          text: 'Esci', 
+        {
+          text: 'Esci',
           style: 'destructive',
-          onPress: () => router.push('/' as any)
-        }
+          onPress: async () => {
+            await logoutUser();
+            router.replace('/login');
+          },
+        },
       ]
     );
   };

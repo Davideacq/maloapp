@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../src/components/avatar';
 import { Notification, NotificationMenu } from '../../src/components/notification-menu';
+import { logoutUser } from '../../src/utils/auth';
 
 // Context per avatar globale
 export const UserAvatarContext = createContext<{
@@ -132,9 +133,8 @@ export default function UserLayout() {
         {
           text: 'Logout',
           style: 'destructive',
-          onPress: () => {
-            // Handle logout logic here
-            console.log('User logged out');
+          onPress: async () => {
+            await logoutUser();
             router.replace('/login');
           },
         },

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AppIcon } from '../../../src/components/app-icon';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../src/components/card';
@@ -264,7 +265,7 @@ export default function SessionsPage() {
             />
           ) : (
             <View style={styles.emptyState}>
-              <Ionicons name="calendar-outline" size={48} color="#9ca3af" />
+              <AppIcon name="calendar" size={48} style={{ tintColor: '#9ca3af' }} />
               <Text style={styles.emptyStateTitle}>Nessuna sessione programmata</Text>
               <Text style={styles.emptyStateText}>
                 Non hai sessioni programmate. Prenota la tua prossima sessione.

@@ -3,10 +3,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppIcon } from '../../../src/components/app-icon';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
+import { logoutUser } from '../../../src/utils/auth';
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState('general');
@@ -14,10 +16,10 @@ export default function AdminSettingsPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   const tabs = [
-    { id: 'general', label: 'Generali', icon: 'color-palette' },
-    { id: 'notifications', label: 'Notifiche', icon: 'notifications' },
-    { id: 'security', label: 'Sicurezza', icon: 'shield' },
-    { id: 'billing', label: 'Fatturazione', icon: 'card' },
+    { id: 'general', label: 'Generali', icon: 'settings' },
+    { id: 'notifications', label: 'Notifiche', icon: 'bell' },
+    { id: 'security', label: 'Sicurezza', icon: 'eye' },
+    { id: 'billing', label: 'Fatturazione', icon: 'book-open' },
   ];
 
   const handleNavigation = (path: string) => {
@@ -41,6 +43,32 @@ export default function AdminSettingsPage() {
             </Button>
             <Text style={styles.headerTitle}>Impostazioni</Text>
           </View>
+          {/* Bottone Logout */}
+          <Button
+            onPress={() => {
+              Alert.alert(
+                'Logout',
+                'Sei sicuro di voler uscire?',
+                [
+                  { text: 'Annulla', style: 'cancel' },
+                  {
+                    text: 'Esci',
+                    style: 'destructive',
+                    onPress: async () => {
+                      await logoutUser();
+                      router.replace('/login');
+                    },
+                  },
+                ]
+              );
+            }}
+            variant="destructive"
+            size="sm"
+            style={{ marginLeft: 12 }}
+          >
+            <Ionicons name="log-out-outline" size={16} color="white" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Logout</Text>
+          </Button>
         </View>
       </View>
 
@@ -53,26 +81,11 @@ export default function AdminSettingsPage() {
                 {tabs.map((tab) => (
                   <Pressable
                     key={tab.id}
+                    style={[styles.tabButton, activeTab === tab.id && styles.activeTabButton]}
                     onPress={() => setActiveTab(tab.id)}
-                    style={[
-                      styles.navItem,
-                      activeTab === tab.id ? styles.navItemActive : styles.navItemInactive,
-                    ]}
                   >
-                    <Ionicons
-                      name={tab.icon as any}
-                      size={20}
-                      color={activeTab === tab.id ? '#9a3412' : '#6b7280'}
-                      style={styles.navIcon}
-                    />
-                    <Text
-                      style={[
-                        styles.navLabel,
-                        activeTab === tab.id ? styles.navLabelActive : styles.navLabelInactive,
-                      ]}
-                    >
-                      {tab.label}
-                    </Text>
+                    <AppIcon name={tab.icon as any} size={20} style={{ marginRight: 8 }} />
+                    <Text style={styles.tabLabel}>{tab.label}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -287,6 +300,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  buttonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
   mainContent: {
     flex: 1,
   },
@@ -306,31 +324,19 @@ const styles = StyleSheet.create({
   navigation: {
     gap: 4,
   },
-  navItem: {
+  tabButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
   },
-  navItemActive: {
+  activeTabButton: {
     backgroundColor: '#fff7ed', // ui-orange-50
   },
-  navItemInactive: {
-    backgroundColor: 'transparent',
-  },
-  navIcon: {
-    marginRight: 12,
-  },
-  navLabel: {
+  tabLabel: {
     fontSize: 14,
     fontWeight: '500',
-  },
-  navLabelActive: {
-    color: '#9a3412', // ui-orange-900
-  },
-  navLabelInactive: {
-    color: '#6b7280', // text-60
   },
   settingsContent: {
     flex: 1,

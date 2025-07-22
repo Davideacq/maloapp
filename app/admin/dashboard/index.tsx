@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
@@ -178,22 +179,22 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <View style={styles.actionsGrid}>
           <Pressable onPress={() => handleNavigation('/admin/users')} style={[styles.actionButton, styles.orangeAction]}>
-            <Ionicons name="people" size={20} color="white" />
+            <AppIcon name="user" size={20} style={{ marginRight: 8 }} />
             <Text style={styles.actionText}>Gestione Utenti</Text>
           </Pressable>
 
           <Pressable onPress={() => handleNavigation('/admin/companies')} style={[styles.actionButton, styles.blueAction]}>
-            <Ionicons name="business" size={20} color="#3b82f6" />
+            <AppIcon name="home" size={20} style={{ marginRight: 8 }} />
             <Text style={[styles.actionText, styles.blueActionText]}>Gestione Aziende</Text>
           </Pressable>
 
           <Pressable onPress={() => handleNavigation('/admin/content')} style={[styles.actionButton, styles.tealAction]}>
-            <Ionicons name="settings" size={20} color="#14b8a6" />
+            <AppIcon name="settings" size={20} style={{ marginRight: 8 }} />
             <Text style={[styles.actionText, styles.tealActionText]}>Gestione Contenuti</Text>
           </Pressable>
 
           <Pressable onPress={() => handleNavigation('/admin/analytics')} style={[styles.actionButton, styles.lightBlueAction]}>
-            <Ionicons name="trending-up" size={20} color="#0ea5e9" />
+            <AppIcon name="book-open" size={20} style={{ marginRight: 8 }} />
             <Text style={[styles.actionText, styles.lightBlueActionText]}>Analytics</Text>
           </Pressable>
         </View>

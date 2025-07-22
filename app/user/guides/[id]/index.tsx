@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppIcon } from '../../../../src/components/app-icon';
 import { Breadcrumb } from '../../../../src/components/breadcrumb';
 import { Card, CardContent } from '../../../../src/components/card';
 
@@ -98,7 +99,7 @@ Pratica queste tecniche regolarmente per ottenere i migliori risultati. Ricorda 
           <Image source={travelImage} style={styles.coverImage} resizeMode="cover" />
           <View style={styles.coverOverlay}>
             <Pressable style={styles.backButton} onPress={handleBackToGuides}>
-              <Ionicons name="arrow-back" size={24} color="white" />
+              <AppIcon name="arrow-left" size={24} />
             </Pressable>
           </View>
         </View>

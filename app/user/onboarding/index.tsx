@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppIcon } from '../../../src/components/app-icon';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent } from '../../../src/components/card';
 
@@ -135,21 +136,21 @@ export default function OnboardingPage() {
   const renderWelcomeStep = () => (
     <View style={styles.welcomeContainer}>
       <View style={styles.welcomeIcon}>
-        <Ionicons name="heart" size={64} color="#3b82f6" />
+        <AppIcon name="user" size={64} style={{ tintColor: '#3b82f6' }} />
       </View>
       <Text style={styles.welcomeTitle}>{currentStepData.title}</Text>
       <Text style={styles.welcomeDescription}>{currentStepData.description}</Text>
       <View style={styles.welcomeFeatures}>
         <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+          <AppIcon name="check" size={24} style={{ tintColor: '#10b981' }} />
           <Text style={styles.featureText}>Sessioni personalizzate</Text>
         </View>
         <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+          <AppIcon name="check" size={24} style={{ tintColor: '#10b981' }} />
           <Text style={styles.featureText}>Supporto professionale</Text>
         </View>
         <View style={styles.featureItem}>
-          <Ionicons name="checkmark-circle" size={24} color="#10b981" />
+          <AppIcon name="check" size={24} style={{ tintColor: '#10b981' }} />
           <Text style={styles.featureText}>Massima riservatezza</Text>
         </View>
       </View>
