@@ -1,5 +1,6 @@
+// Breadcrumb universale e riutilizzabile per App, Web App e Web App Mobile
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export interface BreadcrumbItem {
   label: string;
@@ -10,9 +11,11 @@ interface BreadcrumbProps {
   items: BreadcrumbItem[];
 }
 
+// Componente Breadcrumb riutilizzabile e responsivo
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
+  const isWebMobile = Platform.OS === 'web' && typeof window !== 'undefined' && window.innerWidth <= 600;
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isWebMobile && { paddingVertical: 8, minHeight: 32 }]}> {/* minHeight più bassa su mobile web */}
       {items.map((item, idx) => (
         <React.Fragment key={item.label + idx}>
           {item.onPress ? (
@@ -35,8 +38,11 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     marginBottom: 24,
-    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    minHeight: 48,
   },
   link: {
     paddingHorizontal: 4,

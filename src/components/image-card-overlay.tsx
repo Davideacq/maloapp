@@ -108,15 +108,16 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   mobileImageContainer: {
-    aspectRatio: 2 / 1,
+    height: 180,
+    width: '100%',
     overflow: 'hidden',
   },
   mobileImage: {
     width: '100%',
-    height: '100%',
+    height: 180,
   },
   mobileContent: {
-    padding: 16,
+    padding: 24,
     gap: 12,
   },
   mobileTitle: {

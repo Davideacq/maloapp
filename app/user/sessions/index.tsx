@@ -7,6 +7,7 @@ import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../src/components/card';
+import { useScreenSize } from '../../../src/hooks/use-screen-size';
 
 export default function SessionsPage() {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -193,6 +194,8 @@ export default function SessionsPage() {
     );
   };
 
+  const { isSmallScreen } = useScreenSize();
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
@@ -286,13 +289,12 @@ export default function SessionsPage() {
       )}
 
       {activeTab === 'packages' && (
-        <View style={styles.tabContent}>
-          <FlatList
-            data={sessionPackages}
-            renderItem={renderPackage}
-            keyExtractor={(item) => item.id.toString()}
-            scrollEnabled={false}
-          />
+        <View style={[styles.tabContent, !isSmallScreen && { flexDirection: 'row', gap: 16 }]}> 
+          {sessionPackages.map((pkg) => (
+            <View key={pkg.id} style={!isSmallScreen ? { flex: 1 } : undefined}>
+              {renderPackage({ item: pkg })}
+            </View>
+          ))}
         </View>
       )}
     </ScrollView>
@@ -385,7 +387,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sessionContent: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   sessionHeader: {
     flexDirection: 'row',
@@ -451,6 +454,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginBottom: 16,
     position: 'relative',
+    alignSelf: 'stretch',
   },
   popularPackage: {
     borderWidth: 2,
@@ -497,10 +501,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   purchaseButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#f97316', // arancione
+    borderColor: '#f97316',
+    borderWidth: 1,
   },
   popularButton: {
-    backgroundColor: '#1e3a8a',
+    backgroundColor: '#f97316', // arancione anche per il bottone popolare
+    borderColor: '#f97316',
+    borderWidth: 1,
   },
   emptyState: {
     alignItems: 'center',
