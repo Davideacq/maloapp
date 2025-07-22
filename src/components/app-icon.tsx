@@ -7,7 +7,6 @@ const iconMap: Record<string, any> = {
   eye: require('../../assets/images/eye.png'),
   'eye-off': require('../../assets/images/eye-off.png'),
   'arrow-left': require('../../assets/images/arrow-left.png'),
-  home: require('../../assets/images/home.png'),
   settings: require('../../assets/images/settings.png'),
   user: require('../../assets/images/user.png'),
   'book-open': require('../../assets/images/book-open.png'),
