@@ -1,11 +1,10 @@
 // Converted from malohr-platform/app/user/dashboard/page.tsx
 // User dashboard with sessions, quick actions, and activity tracking for React Native
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Image,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -34,47 +33,27 @@ export default function UserDashboard() {
 
   const imageCards = [
     {
-      image: require('../../../assets/images/travel.jpg'),
+      image: require('../../../assets/images/suitetravel.jpg'),
       title: "Suite Travel x Malo",
-      subtitle: "Il tuo percorso di benessere psicologico",
-      buttonText: "Profilo",
-      onButtonPress: () => handleNavigation('/user/profile'),
+      subtitle: "Al centro, le persone. Intorno, un mondo da rispettare",
+      buttonText: "Vai al sito",
+      onButtonPress: () => Linking.openURL('https://suitetravel.it/malotravel/'),
     },
     {
-      image: require('../../../assets/images/travel.jpg'),
+      image: require('../../../assets/images/hoover.png'),
       title: "Hoover & Haier",
-      subtitle: "Supporto psicologico aziendale",
-      buttonText: "Info",
-      onButtonPress: () => handleNavigation('/user/dashboard'),
+      subtitle: "Persone al centro, anche a casa",
+      buttonText: "Vai al sito",
+      onButtonPress: () => Linking.openURL('https://www.haier-europe.com/it_IT/promozioni/malo-hr/?utm_source=malohr&utm_medium=referral&utm_campaign=malohr_livelug2025'),
+    },
+    {
+      image: require('../../../assets/images/helkin.jpg'),
+      title: "Helkin",
+      subtitle: "Al centro, le persone. Intorno, un mondo da conoscere",
+      buttonText: "Vai al sito",
+      onButtonPress: () => Linking.openURL('https://www.helkin.it/maloviaggistudio/'),
     },
   ];
-
-  function ImageCardOverlayMobile({ image, title, subtitle, buttonText, onButtonPress }: {
-    image: any;
-    title: string;
-    subtitle?: string;
-    buttonText?: string;
-    onButtonPress?: () => void;
-  }) {
-    return (
-      <View style={styles.mobileImageCard}>
-        <Image source={image} style={styles.mobileImageCardBg} resizeMode="cover" />
-        <LinearGradient
-          colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.2)']}
-          style={styles.mobileImageCardOverlay}
-        />
-        <View style={styles.mobileImageCardContent}>
-          <Text style={styles.mobileImageCardTitle}>{title}</Text>
-          {subtitle && <Text style={styles.mobileImageCardSubtitle}>{subtitle}</Text>}
-          {buttonText && onButtonPress && (
-            <Pressable style={styles.mobileImageCardButton} onPress={onButtonPress}>
-              <Text style={styles.mobileImageCardButtonText}>{buttonText}</Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
-    );
-  }
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -125,15 +104,7 @@ export default function UserDashboard() {
       </View>
 
       {/* Image Cards Section */}
-      {isSmallScreen ? (
-        <View style={styles.mobileImageCardsGrid}>
-          {imageCards.map((card, idx) => (
-            <ImageCardOverlayMobile key={idx} {...card} />
-          ))}
-        </View>
-      ) : (
-        <ImageCardCarousel cards={imageCards} />
-      )}
+      <ImageCardCarousel cards={imageCards} />
 
       {/* Quick Actions */}
       <View style={styles.actionsGrid}>

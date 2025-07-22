@@ -121,6 +121,9 @@ export default function ProfilePage() {
     }
   };
 
+  // Calcola se siamo su Web Mobile (viewport <= 600px)
+  const isWebMobile = Platform.OS === 'web' && typeof window !== 'undefined' && window.innerWidth <= 600;
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -132,7 +135,7 @@ export default function ProfilePage() {
           ]}
         />
         {/* Logout button */}
-        <Button variant="destructive" onPress={handleLogout} style={{ marginLeft: 12 }}>
+        <Button variant="destructive" onPress={handleLogout} style={[styles.logoutButton, isWebMobile && { paddingVertical: 4 }]}>
           Logout
         </Button>
       </View>
@@ -307,7 +310,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Privacy & Security */}
-        <Card style={styles.privacyCard}>
+        <Card style={[styles.privacyCard, isWebMobile && { marginBottom: 80 }]}>
           <CardHeader>
             <CardTitle>Privacy e Sicurezza</CardTitle>
           </CardHeader>
@@ -399,7 +402,8 @@ const styles = StyleSheet.create({
     color: '#1f2937',
   },
   logoutButton: {
-    padding: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
   },
   content: {
     flex: 1,
