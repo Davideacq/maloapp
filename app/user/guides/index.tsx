@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { ImageCardOverlay } from '../../../src/components/image-card-overlay';
 import { Input } from '../../../src/components/input';
 import { useScreenSize } from '../../../src/hooks/use-screen-size';
@@ -147,11 +148,7 @@ export default function GuidesPage() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Breadcrumb */}
-      <View style={styles.breadcrumbContainer}>
-        <Text style={styles.breadcrumbLink} onPress={handleBackToDashboard}>Dashboard</Text>
-        <Text style={styles.breadcrumbSeparator}> / </Text>
-        <Text style={styles.breadcrumbCurrent}>Guide Personalizzate</Text>
-      </View>
+      <Breadcrumb items={[{ label: 'Dashboard', onPress: handleBackToDashboard }, { label: 'Guide Personalizzate' }]} />
 
       <ScrollView style={styles.content}>
         {/* Search Bar */}
@@ -222,27 +219,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9fafb',
-  },
-  breadcrumbContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 8,
-  },
-  breadcrumbLink: {
-    color: '#3b82f6',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  breadcrumbSeparator: {
-    color: '#6b7280',
-    fontSize: 15,
-  },
-  breadcrumbCurrent: {
-    color: '#111827',
-    fontWeight: '500',
-    fontSize: 15,
   },
   content: {
     flex: 1,

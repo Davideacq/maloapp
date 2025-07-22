@@ -87,7 +87,8 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'column',
     gap: 6, // space-y-1.5
-    padding: 24, // p-6
+    paddingVertical: 24,
+    paddingHorizontal: 24,
   },
   cardTitle: {
     fontSize: 24, // text-2xl
@@ -102,14 +103,14 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   cardContent: {
-    padding: 24, // p-6
-    paddingTop: 0, // pt-0
+    paddingVertical: 24,
+    paddingHorizontal: 24,
   },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 24, // p-6
-    paddingTop: 0, // pt-0
+    paddingVertical: 24,
+    paddingHorizontal: 24,
   },
 });
 

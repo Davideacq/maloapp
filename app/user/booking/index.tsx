@@ -5,10 +5,10 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader } from '../../../src/components/card';
+import { useIsMobile } from '../../../src/hooks/use-mobile';
 
 export default function BookingPage() {
   const [selectedPsychologist, setSelectedPsychologist] = useState<string | null>(null);
@@ -16,29 +16,20 @@ export default function BookingPage() {
   const psychologists = [
     {
       id: '1',
-      name: 'Dr.ssa Maria Bianchi',
-      specialization: 'Stress e Ansia',
-      experience: '8 anni',
-      rating: 4.9,
-      description: 'Specializzata in gestione dello stress lavorativo e tecniche di mindfulness.',
+      name: 'WorkCare',
+      specialization: 'Supporto psicologico per il benessere lavorativo',
       availability: 'Disponibile questa settimana',
     },
     {
       id: '2',
-      name: 'Dr. Marco Rossi',
-      specialization: 'Work-Life Balance',
-      experience: '12 anni',
-      rating: 4.8,
-      description: 'Esperto in equilibrio vita-lavoro e gestione del tempo.',
+      name: 'Accompagnamento alla Leadership',
+      specialization: 'Percorsi di crescita e sviluppo della leadership',
       availability: 'Disponibile da lunedì prossimo',
     },
     {
       id: '3',
-      name: 'Dr.ssa Laura Verdi',
-      specialization: 'Comunicazione',
-      experience: '6 anni',
-      rating: 4.9,
-      description: 'Specializzata in comunicazione efficace e relazioni interpersonali.',
+      name: "Sportello d'ascolto",
+      specialization: 'Spazio di ascolto e supporto per ogni esigenza',
       availability: 'Disponibile oggi',
     },
   ];
@@ -69,6 +60,7 @@ export default function BookingPage() {
   };
 
   const selectedPsych = psychologists.find((p) => p.id === selectedPsychologist);
+  const isMobile = useIsMobile();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,41 +78,35 @@ export default function BookingPage() {
           <>
             {/* Psychologist Selection */}
             <View style={styles.selectionSection}>
-              <Text style={styles.sectionTitle}>Scegli il tuo Psicologo</Text>
+              <Text style={styles.sectionTitle}>Scegli il servizio adatto a te</Text>
               <Text style={styles.sectionDescription}>
-                Seleziona lo psicologo più adatto alle tue esigenze per prenotare una sessione
+                Seleziona il servizio più adatto alle tue esigenze per prenotare una sessione
               </Text>
             </View>
 
-            <View style={styles.psychologistGrid}>
+            <View
+              style={[
+                styles.psychologistGrid,
+                isMobile
+                  ? { flexDirection: 'column' }
+                  : { flexDirection: 'row', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between' },
+              ]}
+            >
               {psychologists.map((psychologist) => (
                 <Pressable
                   key={psychologist.id}
                   onPress={() => setSelectedPsychologist(psychologist.id)}
-                  style={styles.psychologistCard}
+                  style={[
+                    styles.psychologistCard,
+                    !isMobile && { flexBasis: '32%', minWidth: 280, flexGrow: 1, maxWidth: '32%' },
+                  ]}
                 >
-                  <Card style={styles.card}>
+                  <Card style={[styles.card, !isMobile && { height: '100%' }]}> 
                     <CardHeader style={styles.cardHeader}>
-                      <View style={styles.psychologistAvatar}>
-                        <Ionicons name="person" size={40} color="white" />
-                      </View>
                       <Text style={styles.psychologistName}>{psychologist.name}</Text>
                       <Text style={styles.psychologistSpecialization}>{psychologist.specialization}</Text>
                     </CardHeader>
                     <CardContent style={styles.cardContent}>
-                      <View style={styles.psychologistInfo}>
-                        <View style={styles.infoRow}>
-                          <Text style={styles.infoLabel}>Esperienza:</Text>
-                          <Badge variant="secondary" style={styles.experienceBadge}>
-                            <Text style={styles.badgeText}>{psychologist.experience}</Text>
-                          </Badge>
-                        </View>
-                        <View style={styles.infoRow}>
-                          <Text style={styles.infoLabel}>Valutazione:</Text>
-                          <Text style={styles.rating}>⭐ {psychologist.rating}</Text>
-                        </View>
-                      </View>
-                      <Text style={styles.description}>{psychologist.description}</Text>
                       <View style={styles.availabilityContainer}>
                         <Ionicons name="time" size={16} color="#22c55e" />
                         <Text style={styles.availability}>{psychologist.availability}</Text>
@@ -135,19 +121,24 @@ export default function BookingPage() {
             </View>
 
             {/* Info Section */}
-            <Card style={StyleSheet.flatten([styles.card, styles.infoCard])}>
+            <Card style={StyleSheet.flatten([styles.card, styles.infoCard, isMobile && { marginBottom: 80 }])}>
               <CardHeader>
                 <Text style={styles.infoCardTitle}>Come Funziona</Text>
               </CardHeader>
               <CardContent style={styles.infoCardContent}>
-                <View style={styles.stepsGrid}>
+                <View
+                  style={[
+                    styles.stepsGrid,
+                    !isMobile && { flexDirection: 'row', justifyContent: 'center', alignItems: 'stretch', gap: 48 },
+                  ]}
+                >
                   <View style={styles.step}>
                     <View style={styles.stepIcon}>
                       <Ionicons name="person" size={24} color="white" />
                     </View>
                     <Text style={styles.stepNumber}>1. Scegli</Text>
                     <Text style={styles.stepDescription}>
-                      Seleziona lo psicologo più adatto alle tue esigenze
+                      Seleziona il servizio più adatto alle tue esigenze
                     </Text>
                   </View>
                   <View style={styles.step}>
@@ -181,10 +172,12 @@ export default function BookingPage() {
                 onPress={() => setSelectedPsychologist(null)}
                 style={styles.changeButton}
               >
-                <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
-                <Text style={styles.outlineButtonText}>Cambia Psicologo</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
+                  <Text style={styles.outlineButtonText}>Cambia Servizio</Text>
+                </View>
               </Button>
-              <Text style={styles.bookingTitle}>Prenota con {selectedPsych?.name}</Text>
+              <Text style={styles.bookingTitle}>Prenota una sessione di {selectedPsych?.name}</Text>
               <Text style={styles.bookingDescription}>Seleziona data e orario per la tua sessione</Text>
             </View>
 
@@ -199,17 +192,7 @@ export default function BookingPage() {
                   <Text style={styles.psychInfoSpecialization}>{selectedPsych?.specialization}</Text>
                 </CardHeader>
                 <CardContent style={styles.psychInfoContent}>
-                  <View style={styles.psychInfoDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Esperienza:</Text>
-                      <Text style={styles.detailValue}>{selectedPsych?.experience}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Valutazione:</Text>
-                      <Text style={styles.detailValue}>⭐ {selectedPsych?.rating}</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.psychInfoDescription}>{selectedPsych?.description}</Text>
+                  {/* Solo descrizione servizio e disponibilità */}
                   <View style={styles.availabilityCard}>
                     <View style={styles.availabilityRow}>
                       <Ionicons name="time" size={16} color="#22c55e" />
@@ -270,6 +253,7 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     marginRight: 4,
+    alignSelf: 'center',
   },
   backButtonText: {
     color: '#374151',
@@ -285,6 +269,7 @@ const styles = StyleSheet.create({
     color: '#374151',
     fontSize: 14,
     fontWeight: '500',
+    textAlignVertical: 'center',
   },
   scrollView: {
     flex: 1,
@@ -339,6 +324,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
     textAlign: 'center',
+    alignSelf: 'center',
   },
   cardContent: {
     gap: 16,
@@ -377,6 +363,7 @@ const styles = StyleSheet.create({
   availabilityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
   },
   availability: {
@@ -401,6 +388,7 @@ const styles = StyleSheet.create({
   },
   stepsGrid: {
     gap: 24,
+    flexDirection: 'column',
   },
   step: {
     alignItems: 'center',
@@ -430,6 +418,8 @@ const styles = StyleSheet.create({
   changeButton: {
     marginBottom: 16,
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   bookingTitle: {
     fontSize: 24,
