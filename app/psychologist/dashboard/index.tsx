@@ -4,13 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
+import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -88,12 +89,12 @@ export default function PsychologistDashboard() {
             style={styles.headerButton}
             onPress={() => handleNavigation('/psychologist/calendar')}
           >
-            <Ionicons name="calendar" size={20} color="#3b82f6" />
+            <AppIcon name="calendar" size={20} style={{ marginRight: 8 }} />
             <Text style={styles.headerButtonText}>Calendario</Text>
           </Pressable>
           
           <Pressable style={styles.headerButton}>
-            <Ionicons name="notifications" size={20} color="#6b7280" />
+            <AppIcon name="bell" size={20} style={{ marginRight: 8 }} />
             <Badge variant="destructive" style={styles.notificationBadge}>
               2
             </Badge>

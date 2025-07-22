@@ -13,6 +13,7 @@ import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../src/components/card';
 import { Dialog } from '../../../src/components/dialog';
 import { Input } from '../../../src/components/input';
+import { logoutUser } from '../../../src/utils/auth';
 import { useUserAvatar } from '../_layout';
 
 export default function ProfilePage() {
@@ -61,11 +62,14 @@ export default function ProfilePage() {
       'Sei sicuro di voler uscire?',
       [
         { text: 'Annulla', style: 'cancel' },
-        { 
-          text: 'Esci', 
+        {
+          text: 'Esci',
           style: 'destructive',
-          onPress: () => router.push('/' as any)
-        }
+          onPress: async () => {
+            await logoutUser();
+            router.replace('/login');
+          },
+        },
       ]
     );
   };
@@ -76,8 +80,8 @@ export default function ProfilePage() {
       'Sei sicuro di voler eliminare il tuo account? Questa azione non può essere annullata.',
       [
         { text: 'Annulla', style: 'cancel' },
-        { 
-          text: 'Elimina', 
+        {
+          text: 'Elimina',
           style: 'destructive',
           onPress: () => {
             Alert.alert('Account Eliminato', 'Il tuo account è stato eliminato con successo');
@@ -184,10 +188,10 @@ export default function ProfilePage() {
                 onPress={() => setIsEditing(!isEditing)}
                 style={styles.editButton}
               >
-                <Ionicons 
-                  name={isEditing ? "close" : "pencil"} 
-                  size={20} 
-                  color={isEditing ? "#ef4444" : "#3b82f6"} 
+                <Ionicons
+                  name={isEditing ? "close" : "pencil"}
+                  size={20}
+                  color={isEditing ? "#ef4444" : "#3b82f6"}
                 />
               </Pressable>
             </View>

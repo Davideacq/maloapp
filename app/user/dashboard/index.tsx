@@ -4,13 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Linking,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
+    Linking,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
+import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { ImageCardCarousel } from '../../../src/components/image-card-carousel';
@@ -70,7 +71,7 @@ export default function UserDashboard() {
                 <Text style={[styles.statValue, styles.orangeValue]}>{user.sessionsRemaining}</Text>
               </View>
               <View style={[styles.statIcon, styles.orangeIcon]}>
-                <Ionicons name="calendar" size={24} color="white" />
+                <AppIcon name="calendar" size={24} style={{ tintColor: 'white' }} />
               </View>
             </View>
           </CardContent>
@@ -83,7 +84,7 @@ export default function UserDashboard() {
                 <Text style={[styles.statValue, styles.orangeValue]}>{user.completedSessions}</Text>
               </View>
               <View style={[styles.statIcon, styles.orangeIcon]}>
-                <Ionicons name="heart" size={24} color="white" />
+                <AppIcon name="user" size={24} style={{ tintColor: 'white' }} />
               </View>
             </View>
           </CardContent>
@@ -96,7 +97,7 @@ export default function UserDashboard() {
                 <Text style={[styles.nextSessionValue, styles.orangeValue]}>{user.nextSession}</Text>
               </View>
               <View style={[styles.statIcon, styles.orangeIcon]}>
-                <Ionicons name="time" size={24} color="white" />
+                <AppIcon name="eye" size={24} style={{ tintColor: 'white' }} />
               </View>
             </View>
           </CardContent>
@@ -109,7 +110,7 @@ export default function UserDashboard() {
       {/* Quick Actions */}
       <View style={styles.actionsGrid}>
         <Pressable onPress={() => handleNavigation('/user/booking')} style={[styles.actionButton, styles.blueAction]}>
-          <Ionicons name="calendar" size={20} color="white" />
+          <AppIcon name="calendar" size={20} style={{ tintColor: 'white', marginRight: 8 }} />
           <Text style={styles.actionText}>Prenota Sessione</Text>
         </Pressable>
 
