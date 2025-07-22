@@ -6,6 +6,9 @@ node_modules/
 # Expo
 .expo/
 dist/
+!dist/assets/
+!dist/assets/images/
+!dist/assets/images/*
 web-build/
 expo-env.d.ts
 
