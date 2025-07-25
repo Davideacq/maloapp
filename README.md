@@ -176,6 +176,77 @@ src/
 - `npx expo start -c` - Start with cleared cache
 - `npx expo upgrade` - Update Expo SDK
 
+## Esecuzione del Progetto su Diversi Dispositivi
+
+### iOS (macOS)
+1. Assicurati di avere un Mac con Xcode installato.
+2. Installa Expo CLI se non già presente:
+   ```bash
+   npm install -g expo-cli
+   ```
+3. Avvia il server di sviluppo:
+   ```bash
+   npx expo start -c
+   ```
+4. Premi `i` nella console per aprire l'app nell'iOS Simulator, oppure scansiona il QR code con l'app Expo Go su un dispositivo iOS reale.
+
+### Windows
+1. Installa Node.js (ultima LTS) e Git Bash o un terminale compatibile.
+2. Installa Expo CLI:
+   ```bash
+   npm install -g expo-cli
+   ```
+3. Avvia il server di sviluppo:
+   ```bash
+   npx expo start -c
+   ```
+4. Premi `a` nella console per aprire l'app nell'Android Emulator (devi avere Android Studio e un emulatore configurato), oppure scansiona il QR code con Expo Go su un dispositivo Android reale.
+5. Per lo sviluppo web, premi `w` per aprire l'app nel browser.
+
+### Linux
+1. Installa Node.js (ultima LTS) e Git.
+2. Installa Expo CLI:
+   ```bash
+   npm install -g expo-cli
+   ```
+3. Avvia il server di sviluppo:
+   ```bash
+   npx expo start -c
+   ```
+4. Premi `a` per Android Emulator (se configurato), oppure scansiona il QR code con Expo Go su un dispositivo Android reale.
+5. Per lo sviluppo web, premi `w` per aprire l'app nel browser.
+
+> **Nota:** Su Windows e Linux non è possibile avviare l'iOS Simulator. Per testare su iOS, usa un dispositivo reale con Expo Go oppure un Mac.
+
+---
+
+## Collaborazione e Gestione dei Branch
+
+1. **Clona la repository:**
+   ```bash
+   git clone <URL_REPO>
+   cd maloapp
+   ```
+2. **Crea un nuovo branch per le tue modifiche:**
+   ```bash
+   git checkout -b nome-tuo-branch
+   ```
+3. **Effettua le modifiche e committa:**
+   ```bash
+   git add .
+   git commit -m "Descrizione delle modifiche"
+   ```
+4. **Pusha il branch remoto:**
+   ```bash
+   git push origin nome-tuo-branch
+   ```
+5. **Apri una Pull Request** su GitHub per richiedere la revisione e l'unione delle modifiche su `main`.
+
+> **Consigli:**
+> - Mantieni il branch `main` sempre aggiornato (`git pull origin main`).
+> - Lavora sempre su branch separati per ogni feature o fix.
+> - Risolvi eventuali conflitti prima di aprire la Pull Request.
+
 ## UI Components
 
 Visit `/styleguide` in the app to see all available components organized in tabs:
