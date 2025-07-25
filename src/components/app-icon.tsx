@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, ImageStyle, StyleProp } from 'react-native';
 
 const iconMap: Record<string, any> = {
+
   check: require('../../assets/images/check.png'),
   bell: require('../../assets/images/bell.png'),
   eye: require('../../assets/images/eye.png'),
