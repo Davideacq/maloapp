@@ -1,8 +1,7 @@
 ---
-alwaysApply: true
+description:   
+alwaysApply: false
 ---
-
-
   You are an expert in JavaScript, React Native, Expo, and Mobile UI development.
   
   Code Style and Structure:
