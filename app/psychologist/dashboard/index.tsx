@@ -150,14 +150,19 @@ export default function PsychologistDashboard() {
               )}
             </Pressable>
             
-            <Pressable 
-              style={styles.avatar}
-              onPress={() => handleNavigation('/psychologist/profile')}
-            >
-              <View style={styles.avatarCircle}>
-                <Text style={styles.avatarText}>MB</Text>
-              </View>
-            </Pressable>
+            <View style={styles.profileContainer}>
+              <Pressable
+                onPress={() => handleNavigation('/psychologist/profile')}
+                style={styles.profileButton}
+              >
+                <View style={styles.profileInfo}>
+                  <View style={styles.profileAvatar}>
+                    <Text style={styles.avatarText}>MB</Text>
+                  </View>
+                  <Text style={styles.userName}>Maria Bianchi</Text>
+                </View>
+              </Pressable>
+            </View>
           </View>
         </View>
 
@@ -328,19 +333,40 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'white',
   },
-  avatar: {
-    marginLeft: 8,
+  profileContainer: {
+    position: 'relative',
+    zIndex: 1001,
   },
-  avatarCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  profileButton: {
+    cursor: 'pointer',
+  },
+  profileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    height: 40,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    justifyContent: 'center',
+  },
+  userName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  profileAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 100,
     backgroundColor: '#3b82f6',
     alignItems: 'center',
     justifyContent: 'center',
+    borderColor: '#e5e7eb',
+    paddingVertical: 25,
+    paddingHorizontal: 25,
   },
   avatarText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     color: 'white',
   },
