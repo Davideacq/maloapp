@@ -4,14 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
-import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
@@ -129,15 +128,22 @@ export default function PsychologistDashboard() {
               style={styles.headerButton}
               onPress={() => handleNavigation('/psychologist/calendar')}
             >
-              <AppIcon name="calendar" size={20} style={{ marginRight: 8 }} />
+              <Ionicons name="calendar" size={20} color="#3b82f6" style={{ marginRight: 8 }} />
               <Text style={styles.headerButtonText}>Calendario</Text>
             </Pressable>
             
-            <Pressable style={styles.headerButton} onPress={() => setShowNotifications(true)}>
-              <AppIcon name="bell" size={20} style={{ marginRight: 8 }} />
-              <Badge variant="destructive" style={styles.notificationBadge}>
-                {notifications.filter(n => !n.isRead).length}
-              </Badge>
+            <Pressable 
+              style={styles.notificationButton} 
+              onPress={() => setShowNotifications(true)}
+            >
+              <Ionicons name="notifications" size={20} color="#6b7280" />
+              {notifications.filter(n => !n.isRead).length > 0 && (
+                <Badge variant="default" style={styles.notificationBadge}>
+                  <Text style={styles.badgeText}>
+                    {notifications.filter(n => !n.isRead).length}
+                  </Text>
+                </Badge>
+              )}
             </Pressable>
             
             <Pressable 
@@ -306,12 +312,25 @@ const styles = StyleSheet.create({
   },
   notificationBadge: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    paddingHorizontal: 4,
+    top: -6,
+    right: -6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'white',
+  },
+  notificationButton: {
+    position: 'relative',
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
   },
   avatar: {
     marginLeft: 8,

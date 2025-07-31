@@ -41,3 +41,8 @@ yarn-error.*
 
 app-example
 .vercel
+
+# Documentation
+DATABASE_SCHEMA.md
+DEVELOPMENT_ROADMAP.md
+IMPLEMENTATION_STATUS.md
