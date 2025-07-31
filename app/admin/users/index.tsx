@@ -3,7 +3,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
 import { Button } from '../../../src/components/button';
@@ -125,16 +125,20 @@ export default function AdminUsersPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Button onPress={() => handleNavigation('/admin/dashboard')} variant="outline" size="sm">
-              <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
-              <Text style={styles.backButtonText}>Dashboard</Text>
-            </Button>
-            <Text style={styles.headerTitle}>Gestione Utenti</Text>
-          </View>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Button onPress={() => handleNavigation('/admin/dashboard')} variant="outline" size="sm">
+            <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
+            <Text style={styles.backButtonText}>Dashboard</Text>
+          </Button>
         </View>
       </View>
 
@@ -356,18 +360,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,

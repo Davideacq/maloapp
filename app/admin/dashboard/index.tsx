@@ -3,7 +3,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
@@ -79,20 +79,24 @@ export default function AdminDashboard() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>MaloHR Admin</Text>
-          <View style={styles.headerRight}>
-            <Button onPress={() => handleNavigation('/admin/companies/create')} variant="default" size="sm">
-              <Ionicons name="add" size={16} color="white" style={styles.buttonIcon} />
-              <Text style={styles.buttonText}>Aggiungi Azienda</Text>
-            </Button>
-            <Button onPress={() => handleNavigation('/admin/settings')} variant="outline" size="sm">
-              <Ionicons name="settings" size={16} color="#666" style={styles.buttonIcon} />
-              <Text style={styles.outlineButtonText}>Impostazioni</Text>
-            </Button>
-          </View>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Button onPress={() => handleNavigation('/admin/companies/create')} variant="default" size="sm">
+            <Ionicons name="add" size={16} color="white" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Aggiungi Azienda</Text>
+          </Button>
+          <Button onPress={() => handleNavigation('/admin/settings')} variant="outline" size="sm">
+            <Ionicons name="settings" size={16} color="#666" style={styles.buttonIcon} />
+            <Text style={styles.outlineButtonText}>Impostazioni</Text>
+          </Button>
         </View>
       </View>
 
@@ -349,26 +353,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#9a3412', // ui-orange-900
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 32,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 16,
   },
   buttonIcon: {
     marginRight: 4,
