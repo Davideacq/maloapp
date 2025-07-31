@@ -3,10 +3,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -165,13 +164,21 @@ export default function PsychologistCalendarPage() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', onPress: handleBackToDashboard },
-            { label: 'Calendario' },
-          ]}
-        />
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Button onPress={handleBackToDashboard} variant="outline" size="sm">
+            <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
+            <Text style={styles.backButtonText}>Dashboard</Text>
+          </Button>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -369,21 +376,24 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    borderBottomColor: '#f3f4f6',
   },
   headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,

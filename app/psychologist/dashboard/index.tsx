@@ -11,8 +11,6 @@ import {
   Text,
   View
 } from 'react-native';
-import { AppIcon } from '../../../src/components/app-icon';
-import { Badge } from '../../../src/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
 
@@ -126,18 +124,30 @@ export default function PsychologistDashboard() {
           </View>
           <View style={styles.headerRight}>
             <Pressable 
-              style={styles.headerButton}
+              style={styles.calendarButton}
               onPress={() => handleNavigation('/psychologist/calendar')}
             >
-              <AppIcon name="calendar" size={20} style={{ marginRight: 8 }} />
-              <Text style={styles.headerButtonText}>Calendario</Text>
+              <Ionicons name="calendar" size={20} color="#3b82f6" />
+              <Text style={styles.calendarButtonText}>Calendario</Text>
+              {stats.todaySessions > 0 && (
+                <View style={styles.calendarIndicator}>
+                  <Text style={styles.indicatorText}>{stats.todaySessions}</Text>
+                </View>
+              )}
             </Pressable>
             
-            <Pressable style={styles.headerButton} onPress={() => setShowNotifications(true)}>
-              <AppIcon name="bell" size={20} style={{ marginRight: 8 }} />
-              <Badge variant="destructive" style={styles.notificationBadge}>
-                {notifications.filter(n => !n.isRead).length}
-              </Badge>
+            <Pressable 
+              style={styles.notificationButton} 
+              onPress={() => setShowNotifications(true)}
+            >
+              <Ionicons name="notifications" size={20} color="#1e40af" />
+              {notifications.filter(n => !n.isRead).length > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.badgeText}>
+                    {notifications.filter(n => !n.isRead).length}
+                  </Text>
+                </View>
+              )}
             </Pressable>
             
             <Pressable 
@@ -289,6 +299,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
+  // Stili legacy per compatibilità (da rimuovere in futuro)
   headerButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -306,12 +317,16 @@ const styles = StyleSheet.create({
   },
   notificationBadge: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    paddingHorizontal: 4,
+    top: -6,
+    right: -6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
   },
   avatar: {
     marginLeft: 8,
@@ -497,5 +512,56 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'white',
     textAlign: 'center',
+  },
+  calendarButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+    position: 'relative',
+  },
+  calendarButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e40af',
+    marginLeft: 8,
+  },
+  calendarIndicator: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#14b5e2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+  },
+  indicatorText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: 'white',
+  },
+  notificationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+    position: 'relative',
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: 'white',
   },
 }); 

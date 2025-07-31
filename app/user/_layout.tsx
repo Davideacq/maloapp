@@ -172,8 +172,7 @@ export default function UserLayout() {
       {/* Top Header - Only for Web with sufficient space */}
       {Platform.OS === 'web' && !useBottomNavigation && (
         <View style={styles.header}>
-          <View style={styles.headerContent}>
-            {/* Logo - Only show on web */}
+          <View style={styles.headerLeft}>
             <Pressable onPress={() => handleNavigation('/user/dashboard')}>
               <Image 
                 source={require('../../assets/images/malo-logo-dark.png')}
@@ -181,81 +180,80 @@ export default function UserLayout() {
                 resizeMode="contain"
               />
             </Pressable>
+          </View>
 
-            {/* Right side navigation */}
-            <View style={styles.headerRight}>
-              {/* Booking Button - Only show on web */}
-              <Pressable 
-                style={styles.outlinedButton}
-                onPress={() => handleNavigation('/user/booking')}
+          <View style={styles.headerRight}>
+            {/* Booking Button - Only show on web */}
+            <Pressable 
+              style={styles.outlinedButton}
+              onPress={() => handleNavigation('/user/booking')}
+            >
+              <View style={styles.bookingContainer}>
+                <Ionicons name="add" size={16} color="#374151" />
+                <Text style={styles.bookingText}>Prenota</Text>
+              </View>
+            </Pressable>
+
+            {/* Notification Badge */}
+            <Pressable 
+              style={styles.notificationButton}
+              onPress={() => setShowNotifications(true)}
+            >
+              <Ionicons name="notifications" size={20} color="#1e40af" />
+              {unreadCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+
+            {/* Profile Avatar with Dropdown - Only on web */}
+            <View style={styles.profileContainer}>
+              <Pressable
+                onPress={() => setShowProfileMenu(!showProfileMenu)}
+                style={styles.profileButton}
               >
-                <View style={styles.bookingContainer}>
-                  <Ionicons name="add" size={16} color="#374151" />
-                  <Text style={styles.bookingText}>Prenota</Text>
+                <View style={styles.profileInfo}>
+                  <View style={styles.profileAvatar}>
+                    <Avatar src={avatar} alt={user.name} size="md" />
+                  </View>
+                  <Text style={styles.userName}>{user.name}</Text>
                 </View>
               </Pressable>
-
-              {/* Notification Badge */}
-              <Pressable 
-                style={styles.notificationButton}
-                onPress={() => setShowNotifications(true)}
-              >
-                <Ionicons name="notifications" size={20} color="#6b7280" />
-                {unreadCount > 0 && (
-                  <View style={styles.notificationBadge}>
-                    <Text style={styles.notificationBadgeText}>
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </Text>
+              
+              {/* Profile Dropdown Menu */}
+              {showProfileMenu && (
+                <TouchableWithoutFeedback onPress={closeProfileMenu}>
+                  <View style={styles.dropdownOverlay}>
+                    <TouchableWithoutFeedback onPress={() => {}}>
+                      <View style={styles.dropdownMenu}>
+                        <Pressable
+                          style={styles.dropdownItem}
+                          onPress={() => {
+                            closeProfileMenu();
+                            handleNavigation('/user/profile');
+                          }}
+                        >
+                          <Ionicons name="person" size={16} color="#374151" />
+                          <Text style={styles.dropdownText}>Il tuo profilo</Text>
+                        </Pressable>
+                        <Pressable
+                          style={styles.dropdownItem}
+                          onPress={() => {
+                            closeProfileMenu();
+                            handleLogout();
+                          }}
+                        >
+                          <Ionicons name="log-out" size={16} color="#ef4444" />
+                          <Text style={[styles.dropdownText, styles.logoutText]}>Logout</Text>
+                        </Pressable>
+                      </View>
+                    </TouchableWithoutFeedback>
                   </View>
-                )}
-              </Pressable>
-
-              {/* Profile Avatar with Dropdown - Only on web */}
-              <View style={styles.profileContainer}>
-                <Pressable
-                  onPress={() => setShowProfileMenu(!showProfileMenu)}
-                  style={styles.profileButton}
-                >
-                  <View style={styles.profileInfo}>
-                    <View style={styles.profileAvatar}>
-                      <Avatar src={avatar} alt={user.name} size="md" />
-                    </View>
-                    <Text style={styles.userName}>{user.name}</Text>
-                  </View>
-                </Pressable>
-                
-                {/* Profile Dropdown Menu */}
-                {showProfileMenu && (
-                  <TouchableWithoutFeedback onPress={closeProfileMenu}>
-                    <View style={styles.dropdownOverlay}>
-                      <TouchableWithoutFeedback onPress={() => {}}>
-                        <View style={styles.dropdownMenu}>
-                          <Pressable
-                            style={styles.dropdownItem}
-                            onPress={() => {
-                              closeProfileMenu();
-                              handleNavigation('/user/profile');
-                            }}
-                          >
-                            <Ionicons name="person" size={16} color="#374151" />
-                            <Text style={styles.dropdownText}>Il tuo profilo</Text>
-                          </Pressable>
-                          <Pressable
-                            style={styles.dropdownItem}
-                            onPress={() => {
-                              closeProfileMenu();
-                              handleLogout();
-                            }}
-                          >
-                            <Ionicons name="log-out" size={16} color="#ef4444" />
-                            <Text style={[styles.dropdownText, styles.logoutText]}>Logout</Text>
-                          </Pressable>
-                        </View>
-                      </TouchableWithoutFeedback>
-                    </View>
-                  </TouchableWithoutFeedback>
-                )}
-              </View>
+                </TouchableWithoutFeedback>
+              )}
             </View>
           </View>
         </View>
@@ -331,21 +329,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    zIndex: 1000,
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+    zIndex: 1000,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   logo: {
     width: 120,
-    height: 40,
+    height: 32,
   },
   headerRight: {
     flexDirection: 'row',
@@ -480,32 +481,33 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   notificationButton: {
-    position: 'relative',
-    height: 40,
-    width: 40,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    backgroundColor: 'white',
+    borderColor: '#dbeafe',
+    position: 'relative',
   },
   notificationBadge: {
     position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: '#ef4444',
-    borderRadius: 10,
+    top: -6,
+    right: -6,
     minWidth: 20,
     height: 20,
-    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: '#ef4444',
     alignItems: 'center',
-    zIndex: 1,
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
   },
   notificationBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
     color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   notificationTabContainer: {
     position: 'relative',
