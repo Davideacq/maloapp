@@ -45,13 +45,13 @@ const NotificationMenu: React.FC<NotificationMenuProps> = ({
   const getNotificationColor = (type: Notification['type']) => {
     switch (type) {
       case 'session':
-        return '#3b82f6'; // blue-500
+        return '#3b82f6'; // ui-blue-500
       case 'reminder':
-        return '#f97316'; // orange-500
+        return '#f97316'; // ui-orange-500
       case 'system':
-        return '#6b7280'; // gray-500
+        return '#6b7280'; // text-60
       case 'guide':
-        return '#14b8a6'; // teal-500
+        return '#14b8a6'; // ui-teal-500
       default:
         return '#6b7280';
     }
@@ -67,7 +67,15 @@ const NotificationMenu: React.FC<NotificationMenuProps> = ({
       <Pressable style={styles.overlay} onPress={onClose}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Notifiche</Text>
+            <View style={styles.headerContent}>
+              <Ionicons name="notifications" size={24} color="#3b82f6" />
+              <Text style={styles.title}>Notifiche</Text>
+              <View style={styles.notificationCount}>
+                <Text style={styles.countText}>
+                  {notifications.filter(n => !n.isRead).length}
+                </Text>
+              </View>
+            </View>
             <IconButton
               icon="close"
               onPress={onClose}
@@ -81,6 +89,7 @@ const NotificationMenu: React.FC<NotificationMenuProps> = ({
               <View style={styles.emptyState}>
                 <Ionicons name="notifications-off" size={48} color="#9ca3af" />
                 <Text style={styles.emptyText}>Nessuna notifica</Text>
+                <Text style={styles.emptySubtext}>Le tue notifiche appariranno qui</Text>
               </View>
             ) : (
               notifications.map((notification) => (
@@ -103,23 +112,30 @@ const NotificationMenu: React.FC<NotificationMenuProps> = ({
                       />
                     </View>
                     <View style={styles.notificationText}>
-                      <Text style={styles.notificationTitle}>{notification.title}</Text>
+                      <Text style={[
+                        styles.notificationTitle,
+                        !notification.isRead && styles.unreadTitle
+                      ]}>
+                        {notification.title}
+                      </Text>
                       <Text style={styles.notificationMessage}>{notification.message}</Text>
                       <Text style={styles.notificationTime}>{notification.timestamp}</Text>
                     </View>
                   </View>
                   <View style={styles.notificationActions}>
+                    {!notification.isRead && (
+                      <IconButton
+                        icon="checkmark"
+                        onPress={() => onMarkAsRead(notification.id)}
+                        variant="ghost"
+                        size="sm"
+                        style={styles.actionButton}
+                      />
+                    )}
                     <IconButton
-                      icon="eye"
-                      onPress={() => onMarkAsRead(notification.id)}
-                      variant="ghost"
-                      size="sm"
-                      style={styles.actionButton}
-                    />
-                    <IconButton
-                      icon="close"
+                      icon="trash"
                       onPress={() => onDelete(notification.id)}
-                      variant="destructive"
+                      variant="ghost"
                       size="sm"
                       style={styles.actionButton}
                     />
@@ -139,48 +155,76 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-start',
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   container: {
-    width: 350,
-    maxHeight: '80%',
+    width: 380,
+    maxHeight: '85%',
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 16,
     margin: 16,
-    marginTop: 60,
+    marginTop: 80,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 8,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: '#f3f4f6',
+    backgroundColor: '#fafafa',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: '#1f2937',
+    marginLeft: 12,
+    flex: 1,
+  },
+  notificationCount: {
+    backgroundColor: '#3b82f6',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginLeft: 8,
+  },
+  countText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'white',
   },
   notificationsList: {
-    maxHeight: 400,
+    maxHeight: 450,
   },
   emptyState: {
-    padding: 32,
+    padding: 40,
     alignItems: 'center',
   },
   emptyText: {
     fontSize: 16,
+    fontWeight: '500',
+    color: '#6b7280',
+    marginTop: 12,
+  },
+  emptySubtext: {
+    fontSize: 14,
     color: '#9ca3af',
-    marginTop: 8,
+    marginTop: 4,
   },
   notificationItem: {
     flexDirection: 'row',
@@ -190,7 +234,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   unreadNotification: {
-    backgroundColor: '#fef3c7', // yellow-50
+    backgroundColor: '#eff6ff',
+    borderLeftWidth: 4,
+    borderLeftColor: '#3b82f6',
   },
   notificationContent: {
     flex: 1,
@@ -210,9 +256,13 @@ const styles = StyleSheet.create({
   },
   notificationTitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: '500',
+    color: '#6b7280',
     marginBottom: 4,
+  },
+  unreadTitle: {
+    fontWeight: '600',
+    color: '#1f2937',
   },
   notificationMessage: {
     fontSize: 13,
