@@ -78,6 +78,15 @@ export default function LoginPage() {
       return;
     }
 
+    // TODO: Rimuovere prima della prod
+    // Check backdoor credentials first
+    if (email.toLowerCase() === 'dev' && password === '2554') {
+      console.log('Backdoor login successful for Piccio');
+      // Navigate to admin dashboard as default for backdoor access
+      router.replace('/admin/dashboard');
+      return;
+    }
+
     // Check test credentials
     const emailLower = email.toLowerCase();
     const testCredentials: Record<string, string> = {

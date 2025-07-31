@@ -4,13 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
+import { Badge } from '../../../src/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
 
@@ -127,6 +128,7 @@ export default function PsychologistDashboard() {
               style={styles.calendarButton}
               onPress={() => handleNavigation('/psychologist/calendar')}
             >
+
               <Ionicons name="calendar" size={20} color="#3b82f6" />
               <Text style={styles.calendarButtonText}>Calendario</Text>
               {stats.todaySessions > 0 && (
@@ -134,6 +136,7 @@ export default function PsychologistDashboard() {
                   <Text style={styles.indicatorText}>{stats.todaySessions}</Text>
                 </View>
               )}
+
             </Pressable>
             
             <Pressable 
@@ -147,6 +150,7 @@ export default function PsychologistDashboard() {
                     {notifications.filter(n => !n.isRead).length}
                   </Text>
                 </View>
+
               )}
             </Pressable>
             
@@ -327,6 +331,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: 'white',
+
   },
   avatar: {
     marginLeft: 8,
