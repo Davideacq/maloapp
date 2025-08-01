@@ -17,7 +17,7 @@ import { Notification, NotificationMenu } from '../../../src/components/notifica
 
 export default function PsychologistDashboard() {
   const [stats] = useState({
-    totalPatients: 24,
+    activePatients: 18,
     todaySessions: 6,
     weekSessions: 18,
     completedSessions: 142,
@@ -170,8 +170,8 @@ export default function PsychologistDashboard() {
             <CardContent style={styles.statCardContent}>
               <View style={styles.statCardInner}>
                 <View>
-                  <Text style={[styles.statLabel, styles.tealLabel]}>Pazienti Totali</Text>
-                  <Text style={[styles.statValue, styles.tealValue]}>{stats.totalPatients}</Text>
+                  <Text style={[styles.statLabel, styles.tealLabel]}>Pazienti Attivi</Text>
+                  <Text style={[styles.statValue, styles.tealValue]}>{stats.activePatients}</Text>
                 </View>
                 <View style={[styles.statIcon, styles.tealIcon]}>
                   <Ionicons name="people" size={24} color="white" />
@@ -198,7 +198,7 @@ export default function PsychologistDashboard() {
             <CardContent style={styles.statCardContent}>
               <View style={styles.statCardInner}>
                 <View>
-                  <Text style={[styles.statLabel, styles.successLabel]}>Completate</Text>
+                  <Text style={[styles.statLabel, styles.successLabel]}>Sessioni Completate</Text>
                   <Text style={[styles.statValue, styles.successValue]}>{stats.completedSessions}</Text>
                 </View>
                 <View style={[styles.statIcon, styles.successIcon]}>
