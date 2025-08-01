@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -146,12 +147,14 @@ export default function AdminContentPage() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
+            { label: 'Gestione Contenuti' },
+          ]}
+        />
         <View style={styles.headerContent}>
           <View style={styles.headerLeft}>
-            <Button onPress={() => handleNavigation('/admin/dashboard')} variant="outline" size="sm">
-              <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
-              <Text style={styles.backButtonText}>Dashboard</Text>
-            </Button>
             <Text style={styles.headerTitle}>Gestione Contenuti</Text>
           </View>
         </View>

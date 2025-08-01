@@ -532,29 +532,7 @@ const styles = StyleSheet.create({
   bookButton: {
     backgroundColor: '#3b82f6',
   },
-  breadcrumbContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-    gap: 8,
-  },
-  breadcrumbLink: {
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-  },
-  breadcrumbText: {
-    fontSize: 14,
-    color: '#3b82f6',
-  },
-  breadcrumbSeparator: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginHorizontal: 4,
-  },
-  breadcrumbCurrent: {
-    color: '#111827',
-    fontWeight: 'bold',
-  },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',

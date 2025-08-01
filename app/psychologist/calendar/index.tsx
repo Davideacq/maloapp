@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -166,18 +167,18 @@ export default function PsychologistCalendarPage() {
     <SafeAreaView style={styles.container}>
       {/* Header Navigation */}
       <View style={styles.header}>
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard', onPress: handleBackToDashboard },
+            { label: 'Calendario' },
+          ]}
+        />
         <View style={styles.headerLeft}>
           <Image
             source={require('../../../assets/images/malo-logo-dark.png')}
             style={styles.logo}
             resizeMode="contain"
           />
-        </View>
-        <View style={styles.headerRight}>
-          <Button onPress={handleBackToDashboard} variant="outline" size="sm">
-            <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
-            <Text style={styles.backButtonText}>Dashboard</Text>
-          </Button>
         </View>
       </View>
 

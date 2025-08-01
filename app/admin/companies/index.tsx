@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent } from '../../../src/components/card';
 import { Input } from '../../../src/components/input';
 
@@ -194,14 +195,18 @@ export default function AdminCompaniesPage() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={handleBackToDashboard} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#3b82f6" />
-          <Text style={styles.backText}>Dashboard</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>Gestione Aziende</Text>
-        <Pressable onPress={handleCreateCompany} style={styles.createButton}>
-          <Ionicons name="add" size={20} color="#3b82f6" />
-        </Pressable>
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard', onPress: handleBackToDashboard },
+            { label: 'Gestione Aziende' },
+          ]}
+        />
+        <View style={styles.headerActions}>
+          <Text style={styles.headerTitle}>Gestione Aziende</Text>
+          <Pressable onPress={handleCreateCompany} style={styles.createButton}>
+            <Ionicons name="add" size={20} color="#3b82f6" />
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView style={styles.content}>

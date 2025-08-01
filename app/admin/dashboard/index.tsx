@@ -7,6 +7,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -81,6 +82,11 @@ export default function AdminDashboard() {
     <SafeAreaView style={styles.container}>
       {/* Header Navigation */}
       <View style={styles.header}>
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard' },
+          ]}
+        />
         <View style={styles.headerLeft}>
           <Image
             source={require('../../../assets/images/malo-logo-dark.png')}

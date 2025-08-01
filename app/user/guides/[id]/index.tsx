@@ -151,31 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9fafb',
   },
-  breadcrumbContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 8,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  breadcrumbLink: {
-    color: '#3b82f6',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  breadcrumbSeparator: {
-    color: '#6b7280',
-    fontSize: 15,
-  },
-  breadcrumbCurrent: {
-    color: '#111827',
-    fontWeight: '500',
-    fontSize: 15,
-    flexShrink: 1,
-  },
+
   scrollView: {
     flex: 1,
   },
