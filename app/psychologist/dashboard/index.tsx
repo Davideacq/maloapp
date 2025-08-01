@@ -12,7 +12,6 @@ import {
   View
 } from 'react-native';
 import { Avatar } from '../../../src/components/avatar';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
 
@@ -112,11 +111,6 @@ export default function PsychologistDashboard() {
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         {/* Header Navigation */}
         <View style={styles.header}>
-          <Breadcrumb
-            items={[
-              { label: 'Dashboard' },
-            ]}
-          />
           <View style={styles.headerLeft}>
             <Image
               source={require('../../../assets/images/malo-logo-dark.png')}
