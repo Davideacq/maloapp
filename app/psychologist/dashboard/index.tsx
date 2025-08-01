@@ -4,13 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
+import { Avatar } from '../../../src/components/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
 
@@ -103,12 +104,7 @@ export default function PsychologistDashboard() {
     router.push(path as any);
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('');
-  };
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -156,9 +152,11 @@ export default function PsychologistDashboard() {
                 style={styles.profileButton}
               >
                 <View style={styles.profileInfo}>
-                  <View style={styles.profileAvatar}>
-                    <Text style={styles.avatarText}>MB</Text>
-                  </View>
+                  <Avatar
+                    alt="Maria Bianchi"
+                    size="md"
+                    variant="primary"
+                  />
                   <Text style={styles.userName}>Maria Bianchi</Text>
                 </View>
               </Pressable>
@@ -220,9 +218,10 @@ export default function PsychologistDashboard() {
             <View style={styles.patientsList}>
               {recentPatients.map((patient) => (
                 <View key={patient.id} style={styles.patientItem}>
-                  <View style={styles.patientAvatar}>
-                    <Text style={styles.patientInitials}>{getInitials(patient.name)}</Text>
-                  </View>
+                  <Avatar
+                    alt={patient.name}
+                    size="sm"
+                  />
                   <View style={styles.patientInfo}>
                     <Text style={styles.patientName}>{patient.name}</Text>
                     <Text style={styles.patientCompany}>{patient.company}</Text>
@@ -354,22 +353,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#374151',
   },
-  profileAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 100,
-    backgroundColor: '#3b82f6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderColor: '#e5e7eb',
-    paddingVertical: 25,
-    paddingHorizontal: 25,
-  },
-  avatarText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
+
   statsGrid: {
     flexDirection: 'row',
     gap: 12,
@@ -463,19 +447,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#f9fafb',
   },
-  patientAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#3b82f6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  patientInitials: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: 'white',
-  },
+
   patientInfo: {
     flex: 1,
   },

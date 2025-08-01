@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Avatar } from '../../../src/components/avatar';
 import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
@@ -141,12 +142,7 @@ export default function PsychologistPatientsPage() {
     router.push('/psychologist/dashboard' as any);
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('');
-  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -245,18 +241,19 @@ export default function PsychologistPatientsPage() {
             <Card key={patient.id} style={styles.patientCard}>
               <CardContent style={styles.patientCardContent}>
                 <View style={styles.patientHeader}>
-                  <View style={styles.patientInfo}>
-                    <View style={styles.patientAvatar}>
-                      <Text style={styles.patientInitials}>{getInitials(patient.name)}</Text>
-                    </View>
-                    <View style={styles.patientDetails}>
-                      <Text style={styles.patientName}>{patient.name}</Text>
-                      <Text style={styles.patientEmail}>{patient.email}</Text>
-                      <Text style={styles.patientCompany}>
-                        {patient.company} • {patient.department}
-                      </Text>
-                    </View>
+                                  <View style={styles.patientInfo}>
+                  <Avatar
+                    alt={patient.name}
+                    size="md"
+                  />
+                  <View style={styles.patientDetails}>
+                    <Text style={styles.patientName}>{patient.name}</Text>
+                    <Text style={styles.patientEmail}>{patient.email}</Text>
+                    <Text style={styles.patientCompany}>
+                      {patient.company} • {patient.department}
+                    </Text>
                   </View>
+                </View>
                   <View style={styles.patientActions}>
                     <Badge variant={getStatusVariant(patient.status)}>
                       <Text style={styles.badgeText}>{getStatusLabel(patient.status)}</Text>
@@ -549,19 +546,7 @@ const styles = StyleSheet.create({
     gap: 16,
     flex: 1,
   },
-  patientAvatar: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#14b8a6', // ui-teal-500
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  patientInitials: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '500',
-  },
+
   patientDetails: {
     flex: 1,
   },

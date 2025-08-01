@@ -4,15 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Slot, router } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
-    Alert,
-    Dimensions,
-    Image,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableWithoutFeedback,
-    View
+  Alert,
+  Dimensions,
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../src/components/avatar';
@@ -358,9 +358,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e5e7eb',
     borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: 'white',
+    paddingHorizontal: 10,
+    backgroundColor: '#eff6ff',
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
@@ -368,11 +367,11 @@ const styles = StyleSheet.create({
   bookingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   bookingText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#374151',
   },
   profileContainer: {
