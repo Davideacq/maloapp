@@ -3,11 +3,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
-import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
 export default function AdminAnalyticsPage() {
@@ -71,27 +70,34 @@ export default function AdminAnalyticsPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
-            { label: 'Analytics' },
-          ]}
-        />
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.headerTitle}>Analytics</Text>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
+              { label: 'Analytics' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <View style={styles.timeRangeContainer}>
+            <Text style={styles.timeRangeLabel}>Ultimi 30 giorni</Text>
           </View>
-          <View style={styles.headerRight}>
-            <View style={styles.timeRangeContainer}>
-              <Text style={styles.timeRangeLabel}>Ultimi 30 giorni</Text>
-            </View>
-            <Button onPress={() => {}} variant="default">
-              <Ionicons name="download" size={16} color="white" style={styles.buttonIcon} />
-              <Text style={styles.buttonText}>Esporta Report</Text>
-            </Button>
-          </View>
+          <Pressable 
+            onPress={() => {}} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="download" size={20} color="white" />
+            <Text style={styles.headerButtonText}>Esporta</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -289,31 +295,51 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#3b82f6',
+    borderRadius: 8,
+  },
+  headerButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#9a3412', // ui-orange-900
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
   },
   timeRangeContainer: {
     paddingHorizontal: 12,

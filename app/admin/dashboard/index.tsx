@@ -82,11 +82,6 @@ export default function AdminDashboard() {
     <SafeAreaView style={styles.container}>
       {/* Header Navigation */}
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard' },
-          ]}
-        />
         <View style={styles.headerLeft}>
           <Image
             source={require('../../../assets/images/malo-logo-dark.png')}
@@ -94,19 +89,64 @@ export default function AdminDashboard() {
             resizeMode="contain"
           />
         </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard' },
+            ]}
+          />
+        </View>
         <View style={styles.headerRight}>
-          <Button onPress={() => handleNavigation('/admin/companies/create')} variant="default" size="sm">
-            <Ionicons name="add" size={16} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Aggiungi Azienda</Text>
-          </Button>
-          <Button onPress={() => handleNavigation('/admin/settings')} variant="outline" size="sm">
-            <Ionicons name="settings" size={16} color="#666" style={styles.buttonIcon} />
-            <Text style={styles.outlineButtonText}>Impostazioni</Text>
-          </Button>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/companies/create')} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="add-circle" size={20} color="white" />
+            <Text style={styles.headerButtonText}>Nuova Azienda</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/settings')} 
+            style={styles.headerButtonOutline}
+          >
+            <Ionicons name="settings-outline" size={20} color="#374151" />
+            <Text style={styles.headerButtonTextOutline}>Impostazioni</Text>
+          </Pressable>
         </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Quick Navigation */}
+        <View style={styles.quickNav}>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/companies')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="business" size={24} color="#3b82f6" />
+            <Text style={styles.quickNavText}>Aziende</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/analytics')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="analytics" size={24} color="#14b8a6" />
+            <Text style={styles.quickNavText}>Analytics</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/content')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="library" size={24} color="#f97316" />
+            <Text style={styles.quickNavText}>Contenuti</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/settings')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="settings" size={24} color="#8b5cf6" />
+            <Text style={styles.quickNavText}>Impostazioni</Text>
+          </Pressable>
+        </View>
+
         {/* Dashboard Title */}
         <View style={styles.titleSection}>
           <Text style={styles.mainTitle}>Dashboard Amministratore</Text>
@@ -377,10 +417,44 @@ const styles = StyleSheet.create({
     width: 120,
     height: 32,
   },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#3b82f6',
+    borderRadius: 8,
+  },
+  headerButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  headerButtonOutline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+  },
+  headerButtonTextOutline: {
+    color: '#374151',
+    fontSize: 14,
+    fontWeight: '500',
   },
   buttonIcon: {
     marginRight: 4,
@@ -400,6 +474,29 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+  },
+  quickNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
+  quickNavButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    backgroundColor: '#f9fafb',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    minWidth: 80,
+  },
+  quickNavText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#374151',
+    marginTop: 4,
+    textAlign: 'center',
   },
   titleSection: {
     marginBottom: 32,

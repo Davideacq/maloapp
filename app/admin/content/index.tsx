@@ -3,7 +3,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
@@ -145,18 +145,31 @@ export default function AdminContentPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
-            { label: 'Gestione Contenuti' },
-          ]}
-        />
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.headerTitle}>Gestione Contenuti</Text>
-          </View>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
+              { label: 'Gestione Contenuti' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/content/create')} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="add-circle" size={20} color="white" />
+            <Text style={styles.headerButtonText}>Nuova Guida</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -332,21 +345,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#3b82f6',
+    borderRadius: 8,
+  },
+  headerButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
   headerTitle: {
     fontSize: 20,
