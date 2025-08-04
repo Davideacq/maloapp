@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Avatar } from '../../../src/components/avatar';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
 
@@ -141,6 +142,13 @@ export default function PsychologistDashboard() {
               source={require('../../../assets/images/malo-logo-dark.png')}
               style={styles.logo}
               resizeMode="contain"
+            />
+          </View>
+          <View style={styles.headerCenter}>
+            <Breadcrumb
+              items={[
+                { label: 'Dashboard' },
+              ]}
             />
           </View>
           <View style={styles.headerRight}>
@@ -367,6 +375,11 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logo: {
     width: 120,

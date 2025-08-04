@@ -9,6 +9,7 @@ import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent } from '../../../src/components/card';
+import { Image } from 'react-native';
 
 export default function PsychologistNotesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,12 +98,27 @@ export default function PsychologistNotesPage() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', onPress: handleBackToDashboard },
-            { label: 'Note Cliniche' },
-          ]}
-        />
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: handleBackToDashboard },
+              { label: 'Note Cliniche' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Button onPress={() => {}} variant="outline" size="sm">
+            <Ionicons name="add" size={16} color="#666" style={styles.buttonIcon} />
+            <Text style={styles.outlineButtonText}>Nuova Nota</Text>
+          </Button>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView}>

@@ -10,6 +10,7 @@ import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent } from '../../../src/components/card';
+import { Image } from 'react-native';
 
 export default function PsychologistPatientsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -147,12 +148,27 @@ export default function PsychologistPatientsPage() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', onPress: handleBackToDashboard },
-            { label: 'Gestione Pazienti' },
-          ]}
-        />
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: handleBackToDashboard },
+              { label: 'Gestione Pazienti' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Button onPress={() => {}} variant="outline" size="sm">
+            <Ionicons name="filter" size={16} color="#666" style={styles.buttonIcon} />
+            <Text style={styles.outlineButtonText}>Filtri</Text>
+          </Button>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -353,25 +369,34 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    borderBottomColor: '#f3f4f6',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 16,
   },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
