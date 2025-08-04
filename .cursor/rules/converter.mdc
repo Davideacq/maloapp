@@ -1,5 +1,5 @@
 ---
-alwaysApply: false
+alwaysApply: true
 ---
 Ho un progetto web scritto in Next.js (React + TS) generato con V0.dev. Il codice frontend utilizza componenti React, CSS/Tailwind (Shadcn/UI), ed è organizzato in pagine e componenti UI. Voglio convertire questo progetto web in un’app mobile sviluppata con React Native + TypeScript + Expo (managed workflow). La conversione sarà fatta all’interno di una monorepo che include sia il codice web originale (in /legacy-web) sia la nuova app mobile (in /app). Obiettivi Principali:
 Conversione Componenti UI: Trasforma tutti i componenti e le pagine web in componenti mobile compatibili con React Native/Expo. In particolare, sostituisci gli elementi HTML/CSS con gli equivalenti React Native: non si possono usare direttamente tag HTML o CSS nel codice React Native
