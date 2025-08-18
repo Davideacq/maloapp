@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     Image,
@@ -12,6 +12,8 @@ import {
     Text,
     View,
 } from 'react-native';
+import { api } from '../../../../src/utils/api';
+import { formatDateIT, parseToDate } from '../../../../src/utils/date';
 
 interface SessionData {
   id: number;
@@ -105,21 +107,50 @@ const Badge: React.FC<BadgeProps> = ({ text, variant }) => {
 
 export default function SessionDetailPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [session, setSession] = useState<SessionData | null>(null);
 
-  // Mock data for a single session
-  const session: SessionData = {
-    id: Number(id) || 1,
-    date: "15 Gen 2024",
-    time: "14:30",
-    psychologist: "Dr.ssa Maria Bianchi",
-    psychologistAvatar: "https://via.placeholder.com/80x80/3b82f6/ffffff?text=MB",
-    type: "Online",
-    status: "confirmed",
-    meetingLink: "https://meet.example.com/xyz-abc-123",
-    notes: "In questa sessione esploreremo le tecniche di gestione dello stress e definiremo i prossimi obiettivi.",
-  };
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const res = await api.get<any>(`/sessions/${id}`);
+        if (!res.ok || !res.data) {
+          setError(res.message || 'Impossibile recuperare la sessione');
+          setLoading(false);
+          return;
+        }
+        const s = res.data;
+        const dt = parseToDate(s.session_date);
+        const pad = (v: number) => (v < 10 ? `0${v}` : String(v));
+        const time = dt ? `${pad(dt.getHours())}:${pad(dt.getMinutes())}` : '';
+        const ui: SessionData = {
+          id: s.id,
+          date: formatDateIT(s.session_date),
+          time,
+          psychologist: s.psychologist?.full_name || '—',
+          psychologistAvatar: 'https://via.placeholder.com/80x80/3b82f6/ffffff?text=MB',
+          type: s.session_type || '—',
+          status: s.status === 'scheduled' ? 'confirmed' : s.status,
+          meetingLink: s.google_meet_link || '',
+          notes: s.notes || '',
+        };
+        setSession(ui);
+      } catch (e: any) {
+        setError(e?.message || 'Errore imprevisto');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id]);
 
   const handleJoinSession = () => {
+    if (!session?.meetingLink) {
+      Alert.alert('Link non disponibile', 'Nessun link meeting associato alla sessione');
+      return;
+    }
     Linking.openURL(session.meetingLink).catch(() => {
       Alert.alert('Errore', 'Impossibile aprire il link della sessione');
     });
@@ -150,6 +181,50 @@ export default function SessionDetailPage() {
       ]
     );
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Pressable 
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={20} color="#374151" />
+            <Text style={styles.backButtonText}>Tutte le Sessioni</Text>
+          </Pressable>
+          <Text style={styles.headerTitle}>Dettagli Sessione</Text>
+        </View>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <View style={styles.card}><View style={styles.cardContent}><Text>Caricamento...</Text></View></View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !session) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Pressable 
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={20} color="#374151" />
+            <Text style={styles.backButtonText}>Tutte le Sessioni</Text>
+          </Pressable>
+          <Text style={styles.headerTitle}>Dettagli Sessione</Text>
+        </View>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <View style={styles.card}><View style={styles.cardContent}><Text>{error || 'Sessione non trovata'}</Text></View></View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
