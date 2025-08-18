@@ -3,12 +3,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
+import { Card, CardContent } from '../../../src/components/card';
 
 export default function PsychologistGuidesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,59 +15,15 @@ export default function PsychologistGuidesPage() {
 
   const categories = [
     { id: 'all', label: 'Tutte le categorie' },
-    { id: 'stress', label: 'Gestione Stress' },
-    { id: 'mindfulness', label: 'Mindfulness' },
-    { id: 'communication', label: 'Comunicazione' },
-    { id: 'productivity', label: 'Produttività' },
   ];
 
-  const guides = [
-    {
-      id: 1,
-      title: 'Tecniche di Respirazione per Ridurre lo Stress',
-      category: 'stress',
-      type: 'video',
-      duration: '15 min',
-      difficulty: 'Principiante',
-      status: 'published',
-      assignedPatients: 12,
-      completions: 89,
-      lastUpdated: '2 giorni fa',
-      canEdit: true,
-    },
-    {
-      id: 2,
-      title: 'Mindfulness per la Concentrazione',
-      category: 'mindfulness',
-      type: 'audio',
-      duration: '20 min',
-      difficulty: 'Intermedio',
-      status: 'published',
-      assignedPatients: 8,
-      completions: 67,
-      lastUpdated: '1 settimana fa',
-      canEdit: true,
-    },
-    {
-      id: 3,
-      title: 'Comunicazione Assertiva',
-      category: 'communication',
-      type: 'article',
-      duration: '25 min',
-      difficulty: 'Intermedio',
-      status: 'draft',
-      assignedPatients: 0,
-      completions: 0,
-      lastUpdated: '3 giorni fa',
-      canEdit: true,
-    },
-  ];
+  const guides: any[] = [];
 
   const stats = {
     totalGuides: guides.length,
-    publishedGuides: guides.filter(g => g.status === 'published').length,
-    draftGuides: guides.filter(g => g.status === 'draft').length,
-    assignedGuides: guides.filter(g => g.assignedPatients > 0).length,
+    publishedGuides: 0,
+    draftGuides: 0,
+    assignedGuides: 0,
   };
 
   const handleNavigation = (path: string) => {
@@ -94,12 +49,27 @@ export default function PsychologistGuidesPage() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', onPress: handleBackToDashboard },
-            { label: 'Gestione Guide' },
-          ]}
-        />
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: handleBackToDashboard },
+              { label: 'Gestione Guide' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Pressable onPress={() => {}} style={styles.calendarButton}>
+            <Ionicons name="add" size={20} color="#1e40af" />
+            <Text style={styles.calendarButtonText}>Nuova Guida</Text>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView}>
@@ -150,79 +120,13 @@ export default function PsychologistGuidesPage() {
 
           {/* Guides Grid */}
           <View style={styles.guidesGrid}>
-            {guides.map((guide) => (
-              <Card key={guide.id} style={styles.guideCard}>
-                <CardHeader style={styles.guideCardHeader}>
-                  <View style={styles.guideHeaderTop}>
-                    <Badge 
-                      variant={guide.category === 'stress' ? 'default' : 'default'}
-                    >
-                      {guide.category === 'stress' ? 'Stress' : guide.category}
-                    </Badge>
-                    <Badge variant={getStatusVariant(guide.status)}>
-                      {getStatusLabel(guide.status)}
-                    </Badge>
-                  </View>
-                  <CardTitle style={styles.guideTitle}>{guide.title}</CardTitle>
-                  <View style={styles.guideMeta}>
-                    <View style={styles.metaItem}>
-                      <Ionicons name="time" size={14} color="#6b7280" />
-                      <Text style={styles.metaText}>{guide.duration}</Text>
-                    </View>
-                    <View style={styles.metaItem}>
-                      <Ionicons name="trending-up" size={14} color="#6b7280" />
-                      <Text style={styles.metaText}>{guide.difficulty}</Text>
-                    </View>
-                  </View>
-                </CardHeader>
-
+            {guides.length === 0 && (
+              <Card style={styles.guideCard}>
                 <CardContent style={styles.guideCardContent}>
-                  <View style={styles.statsRow}>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statItemNumber}>{guide.assignedPatients}</Text>
-                      <Text style={styles.statItemLabel}>Assegnata a</Text>
-                    </View>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statItemNumber}>{guide.completions}</Text>
-                      <Text style={styles.statItemLabel}>Completamenti</Text>
-                    </View>
-                  </View>
-
-                  <Text style={styles.lastUpdated}>
-                    Ultimo aggiornamento: {guide.lastUpdated}
-                  </Text>
-
-                  <View style={styles.guideActions}>
-                    <Button 
-                      onPress={() => {}}
-                      style={styles.actionButton}
-                    >
-                      <Ionicons name="eye" size={14} color="#374151" />
-                      <Text style={styles.actionButtonText}>Anteprima</Text>
-                    </Button>
-                    
-                    {guide.canEdit ? (
-                      <Button 
-                        onPress={() => {}}
-                        style={styles.editButton}
-                      >
-                        <Ionicons name="create" size={14} color="white" />
-                        <Text style={styles.editButtonText}>Modifica</Text>
-                      </Button>
-                    ) : (
-                      <Button 
-                        onPress={() => {}}
-                        style={styles.disabledButton}
-                        disabled
-                      >
-                        <Ionicons name="create" size={14} color="#9ca3af" />
-                        <Text style={styles.disabledButtonText}>Sola Lettura</Text>
-                      </Button>
-                    )}
-                  </View>
+                  <Text style={styles.lastUpdated}>Nessuna guida disponibile</Text>
                 </CardContent>
               </Card>
-            ))}
+            )}
           </View>
         </View>
       </ScrollView>
@@ -237,12 +141,49 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: '#f3f4f6',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  calendarButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+    position: 'relative',
+  },
+  calendarButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e40af',
+    marginLeft: 8,
   },
   backButton: {
     flexDirection: 'row',
