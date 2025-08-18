@@ -2,7 +2,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../../src/components/avatar';
@@ -12,14 +12,14 @@ import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../src/components/card';
 import { Dialog } from '../../../src/components/dialog';
 import { Input } from '../../../src/components/input';
-import { logoutUser } from '../../../src/utils/auth';
+import { getUser, logoutUser } from '../../../src/utils/auth';
 
 export default function PsychologistProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
-    firstName: 'Maria',
-    lastName: 'Bianchi',
-    email: 'maria.bianchi@malohr.com',
+    firstName: '',
+    lastName: '',
+    email: '',
     phone: '+39 123 456 7891',
     specialization: 'Stress e Ansia Lavorativa',
     experience: '8 anni',
@@ -63,6 +63,15 @@ export default function PsychologistProfilePage() {
   };
 
   const handleLogout = () => {
+    if (Platform.OS === 'web') {
+      // Su web, Alert con più pulsanti non è supportato: esegui direttamente
+      (async () => {
+        await logoutUser();
+        router.replace('/login');
+      })();
+      return;
+    }
+
     Alert.alert(
       'Logout',
       'Sei sicuro di voler uscire?',
@@ -79,6 +88,26 @@ export default function PsychologistProfilePage() {
       ]
     );
   };
+
+  useEffect(() => {
+    (async () => {
+      const user = await getUser();
+      if (user) {
+        setUserData((prev) => ({
+          ...prev,
+          firstName: user.first_name || '',
+          lastName: user.last_name || '',
+          email: user.email || '',
+        }));
+        setEditData((prev) => ({
+          ...prev,
+          firstName: user.first_name || '',
+          lastName: user.last_name || '',
+          email: user.email || '',
+        }));
+      }
+    })();
+  }, []);
 
   const handlePickAvatar = async () => {
     // Su mobile: chiede permessi, su web non serve
