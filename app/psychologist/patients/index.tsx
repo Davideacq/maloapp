@@ -2,7 +2,7 @@
 // Psychologist patients management page with comprehensive patient profiles for React Native
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../../src/components/avatar';
@@ -10,86 +10,88 @@ import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent } from '../../../src/components/card';
+import { getToken } from '../../../src/utils/auth';
+import { formatDateIT } from '../../../src/utils/date';
 
 
 export default function PsychologistPatientsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompany, setSelectedCompany] = useState('all');
+  const [patients, setPatients] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
-  const companies = [
-    { id: 'all', name: 'Tutte le aziende' },
-    { id: 'azienda-spa', name: 'Azienda SpA' },
-    { id: 'tech-solutions', name: 'Tech Solutions' },
-    { id: 'marketing-pro', name: 'Marketing Pro' },
-    { id: 'finance-corp', name: 'Finance Corp' },
-  ];
+  // PRODUZIONE:
+  // - Sposta l'URL base in `EXPO_PUBLIC_API_URL`
+  // - Usa HTTPS e abilita correttamente CORS sul dominio API
+  const API_BASE = 'http://127.0.0.1:8000/api';
 
-  const patients = [
-    {
-      id: 1,
-      name: 'Mario Rossi',
-      email: 'mario.rossi@azienda.com',
-      company: 'Azienda SpA',
-      department: 'Marketing',
-      startDate: '15 Gen 2024',
-      lastSession: '12 Gen 2024',
-      nextSession: '15 Gen 2024, 14:30',
-      sessionsCompleted: 4,
-      sessionsRemaining: 8,
-      totalSessions: 12,
-      status: 'active',
-      notes: 'Progressi nella gestione dello stress lavorativo. Risponde bene alle tecniche di respirazione.',
-      goals: ['Ridurre stress', 'Migliorare concentrazione'],
-    },
-    {
-      id: 2,
-      name: 'Laura Bianchi',
-      email: 'laura.bianchi@techsolutions.com',
-      company: 'Tech Solutions',
-      department: 'Sviluppo',
-      startDate: '10 Gen 2024',
-      lastSession: '11 Gen 2024',
-      nextSession: '16 Gen 2024, 15:00',
-      sessionsCompleted: 2,
-      sessionsRemaining: 8,
-      totalSessions: 10,
-      status: 'active',
-      notes: 'Lavoro su work-life balance. Difficoltà nel gestire i carichi di lavoro intensi.',
-      goals: ['Work-life balance', 'Gestione tempo'],
-    },
-    {
-      id: 3,
-      name: 'Giuseppe Verdi',
-      email: 'giuseppe.verdi@marketingpro.com',
-      company: 'Marketing Pro',
-      department: 'Vendite',
-      startDate: '8 Gen 2024',
-      lastSession: '9 Gen 2024',
-      nextSession: 'Non programmata',
-      sessionsCompleted: 1,
-      sessionsRemaining: 7,
-      totalSessions: 8,
-      status: 'paused',
-      notes: 'Primo colloquio completato. Valutazione iniziale positiva. In attesa di programmazione.',
-      goals: ['Ansia da prestazione', 'Comunicazione'],
-    },
-    {
-      id: 4,
-      name: 'Anna Moretti',
-      email: 'anna.moretti@financecorp.com',
-      company: 'Finance Corp',
-      department: 'Finanza',
-      startDate: '5 Gen 2024',
-      lastSession: '10 Gen 2024',
-      nextSession: '17 Gen 2024, 16:30',
-      sessionsCompleted: 13,
-      sessionsRemaining: 2,
-      totalSessions: 15,
-      status: 'completing',
-      notes: 'Fase conclusiva del percorso. Ottimi risultati raggiunti nella gestione dell\'ansia.',
-      goals: ['Consolidamento risultati'],
-    },
-  ];
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const token = await getToken();
+        if (!token) {
+          setError('Token mancante: effettua di nuovo il login.');
+          setLoading(false);
+          return;
+        }
+
+        // 1) Recupera id psicologo corrente
+        const meResp = await fetch(`${API_BASE}/psychologists/me`, {
+          headers: {
+            'Authorization': token,
+            'Accept': 'application/json',
+          },
+        });
+        const meData = await meResp.json();
+        if (!meData?.success || !meData?.data?.id) {
+          setError(meData?.message || 'Impossibile recuperare il profilo psicologo');
+          setLoading(false);
+          return;
+        }
+        const psychologistId = meData.data.id as number;
+
+        // 2) Recupera pazienti dello psicologo
+        const resp = await fetch(`${API_BASE}/psychologists/${psychologistId}/patients`, {
+          headers: {
+            'Authorization': token,
+            'Accept': 'application/json',
+          },
+        });
+        const data = await resp.json();
+        if (!data?.success) {
+          setError(data?.message || 'Errore durante il caricamento dei pazienti');
+          setLoading(false);
+          return;
+        }
+
+        // Mappa i pazienti API nella struttura UI
+        const mapped = (data.data as any[]).map((p) => ({
+          id: p.id,
+          name: p.user?.full_name || 'Senza nome',
+          email: p.user?.email || '',
+          company: p.user?.company?.name || '—',
+          department: p.user?.department || '—',
+          startDate: formatDateIT(p.start_date) || '—',
+          lastSession: formatDateIT(p.last_session_date) || '—',
+          nextSession: formatDateIT(p.next_session_date) || '—',
+          sessionsCompleted: p.completed_sessions ?? 0,
+          sessionsRemaining: Math.max((p.total_sessions ?? 0) - (p.completed_sessions ?? 0), 0),
+          totalSessions: p.total_sessions ?? 0,
+          status: p.status || 'active',
+          notes: p.notes || '',
+          goals: [],
+        }));
+        setPatients(mapped);
+      } catch (e: any) {
+        setError(e?.message || 'Errore imprevisto');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const filteredPatients = patients.filter((patient) => {
     const matchesSearch =
@@ -252,6 +254,23 @@ export default function PsychologistPatientsPage() {
         </View>
 
         {/* Patients List */}
+        {loading && (
+          <Card style={styles.emptyCard}>
+            <CardContent style={styles.emptyContent}>
+              <Ionicons name="hourglass" size={32} color="#9ca3af" style={styles.emptyIcon} />
+              <Text style={styles.emptyTitle}>Caricamento pazienti...</Text>
+            </CardContent>
+          </Card>
+        )}
+        {!!error && !loading && (
+          <Card style={styles.emptyCard}>
+            <CardContent style={styles.emptyContent}>
+              <Ionicons name="alert-circle" size={32} color="#ef4444" style={styles.emptyIcon} />
+              <Text style={styles.emptyTitle}>Errore</Text>
+              <Text style={styles.emptyDescription}>{error}</Text>
+            </CardContent>
+          </Card>
+        )}
         <View style={styles.patientsList}>
           {filteredPatients.map((patient) => (
             <Card key={patient.id} style={styles.patientCard}>
