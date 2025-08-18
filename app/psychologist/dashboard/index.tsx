@@ -2,7 +2,7 @@
 // Psychologist dashboard with patients management and session tracking for React Native
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Image,
     Pressable,
@@ -16,8 +16,10 @@ import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
+import { getUser } from '../../../src/utils/auth';
 
 export default function PsychologistDashboard() {
+  const [userName, setUserName] = useState<string>('');
   const [stats] = useState({
     activePatients: 18,
     todaySessions: 6,
@@ -130,6 +132,20 @@ export default function PsychologistDashboard() {
     router.push(path as any);
   };
 
+  useEffect(() => {
+    (async () => {
+      const user = await getUser();
+      if (user) {
+        const fullName = user.full_name && user.full_name.length > 0
+          ? user.full_name
+          : `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim();
+        setUserName(fullName || 'Account');
+      } else {
+        setUserName('Account');
+      }
+    })();
+  }, []);
+
 
 
   return (
@@ -186,11 +202,11 @@ export default function PsychologistDashboard() {
               >
                 <View style={styles.profileInfo}>
                   <Avatar
-                    alt="Maria Bianchi"
+                    alt={userName || 'Account'}
                     size="md"
                     variant="primary"
                   />
-                  <Text style={styles.userName}>Maria Bianchi</Text>
+                  <Text style={styles.userName}>{userName || 'Account'}</Text>
                 </View>
               </Pressable>
             </View>
