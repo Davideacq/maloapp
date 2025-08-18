@@ -15,6 +15,7 @@ import {
   View
 } from 'react-native';
 import { useTypography } from '../../src/hooks/use-typography';
+import { saveAuth } from '../../src/utils/auth';
 
 interface ButtonProps {
   title: string;
@@ -48,28 +49,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const getUserTypeFromEmail = (email: string): 'user' | 'admin' | 'psychologist' | null => {
-    const emailLower = email.toLowerCase();
-    
-    if (emailLower === 'admin@test') {
-      return 'admin';
-    } else if (emailLower === 'psi@test') {
-      return 'psychologist';
-    } else if (emailLower === 'user@test') {
-      return 'user';
-    }
-    
-    // Default logic for other emails
-    if (emailLower.includes('admin')) {
-      return 'admin';
-    } else if (emailLower.includes('psi') || emailLower.includes('psychologist')) {
-      return 'psychologist';
-    } else {
-      return 'user';
-    }
-  };
+  
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Clear any previous error
     setErrorMessage('');
 
@@ -78,39 +60,45 @@ export default function LoginPage() {
       return;
     }
 
-    // TODO: Rimuovere prima della prod
-    // Check backdoor credentials first
-    if (email.toLowerCase() === 'dev' && password === '2554') {
-      console.log('Backdoor login successful for Piccio');
-      // Navigate to admin dashboard as default for backdoor access
-      router.replace('/admin/dashboard');
-      return;
-    }
+    // Chiamata API locale (WAMP) senza client HTTP centralizzato
+    try {
+      // PRODUZIONE:
+      // - Imposta l'URL base via variabile d'ambiente `EXPO_PUBLIC_API_URL` (es. https://api.tuodominio.com/api)
+      // - Abilita CORS nel backend per gli origin di produzione e forza HTTPS
+      // - Se non usi sottocartelle tipo "/backend_maloapp/public", usa percorsi puliti "/api"
+      // - Ricorda di rimuovere eventuali fallback/URL hardcoded per il deploy
+      const API_BASE = 'http://127.0.0.1:8000/api';
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-    // Check test credentials
-    const emailLower = email.toLowerCase();
-    const testCredentials: Record<string, string> = {
-      'admin@test': 'test',
-      'psi@test': 'test',
-      'user@test': 'test'
-    };
+      const data = await response.json();
 
-    if (testCredentials[emailLower] && password === testCredentials[emailLower]) {
-      // Valid test credentials
-      const userType = getUserTypeFromEmail(email);
-      console.log('Login successful:', { email, userType });
-      
-      // Navigate based on user type
-      if (userType === 'user') {
-        router.replace('/user/dashboard');
-      } else if (userType === 'admin') {
-        router.replace('/admin/dashboard');
-      } else if (userType === 'psychologist') {
-        router.replace('/psychologist/dashboard');
+      if (data?.success) {
+        await saveAuth({
+          token: data.data.token,
+          token_type: data.data.token_type,
+          user: data.data.user,
+        });
+
+        const userRole = data.data.user.role as 'user' | 'admin' | 'psychologist';
+        if (userRole === 'admin') {
+          router.replace('/admin/dashboard');
+        } else if (userRole === 'psychologist') {
+          router.replace('/psychologist/dashboard');
+        } else {
+          router.replace('/user/dashboard');
+        }
+      } else {
+        setErrorMessage(data?.message || 'Credenziali non valide');
       }
-    } else {
-      // Show error for incorrect credentials
-      setErrorMessage('Le credenziali inserite non sono corrette. Verifica email e password e riprova.');
+    } catch (e: any) {
+      setErrorMessage(e?.message || 'Errore durante il login');
     }
   };
 
