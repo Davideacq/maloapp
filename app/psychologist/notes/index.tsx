@@ -3,19 +3,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View, Pressable } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent } from '../../../src/components/card';
-import { Image } from 'react-native';
 
 export default function PsychologistNotesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState('all');
-
-  const patients = [
-    { id: 'all', name: 'Tutti i pazienti' },
-  ];
 
   const notes: any[] = [];
 
@@ -26,39 +20,10 @@ export default function PsychologistNotesPage() {
     pendingNotes: 0,
   };
 
-  const handleNavigation = (path: string) => {
-    router.push(path as any);
-  };
-
   const handleBackToDashboard = () => {
     router.push('/psychologist/dashboard' as any);
   };
-
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'success';
-      case 'draft':
-        return 'warning';
-      case 'pending':
-        return 'info';
-      default:
-        return 'info';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'Completata';
-      case 'draft':
-        return 'Bozza';
-      case 'pending':
-        return 'In attesa';
-      default:
-        return 'In attesa';
-    }
-  };
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -90,7 +55,7 @@ export default function PsychologistNotesPage() {
         <View style={styles.content}>
           {/* Stats Cards */}
           <View style={styles.statsGrid}>
-            <Card style={[styles.statCard, styles.tealCard]}>
+            <Card style={StyleSheet.flatten([styles.statCard, styles.tealCard])}>
               <CardContent style={styles.statCardContent}>
                 <View style={[styles.statIcon, styles.tealIcon]}>
                   <Ionicons name="document-text" size={24} color="white" />
@@ -100,7 +65,7 @@ export default function PsychologistNotesPage() {
               </CardContent>
             </Card>
 
-            <Card style={[styles.statCard, styles.successCard]}>
+            <Card style={StyleSheet.flatten([styles.statCard, styles.successCard])}>
               <CardContent style={styles.statCardContent}>
                 <View style={[styles.statIcon, styles.successIcon]}>
                   <Ionicons name="checkmark-done" size={24} color="white" />
