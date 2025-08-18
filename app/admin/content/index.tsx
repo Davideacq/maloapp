@@ -16,74 +16,9 @@ export default function AdminContentPage() {
 
   const categories = [
     { id: 'all', label: 'Tutti i contenuti' },
-    { id: 'stress', label: 'Gestione Stress' },
-    { id: 'mindfulness', label: 'Mindfulness' },
-    { id: 'communication', label: 'Comunicazione' },
-    { id: 'productivity', label: 'Produttività' },
   ];
 
-  const guides = [
-    {
-      id: 1,
-      title: 'Tecniche di Respirazione per Ridurre lo Stress',
-      category: 'stress',
-      type: 'video',
-      duration: '15 min',
-      difficulty: 'Principiante',
-      status: 'published',
-      views: 1234,
-      lastUpdated: '2 giorni fa',
-      author: 'Dr.ssa Maria Bianchi',
-    },
-    {
-      id: 2,
-      title: 'Mindfulness per la Concentrazione',
-      category: 'mindfulness',
-      type: 'audio',
-      duration: '20 min',
-      difficulty: 'Intermedio',
-      status: 'published',
-      views: 856,
-      lastUpdated: '1 settimana fa',
-      author: 'Dr. Marco Rossi',
-    },
-    {
-      id: 3,
-      title: 'Comunicazione Assertiva',
-      category: 'communication',
-      type: 'article',
-      duration: '25 min',
-      difficulty: 'Intermedio',
-      status: 'draft',
-      views: 0,
-      lastUpdated: '3 giorni fa',
-      author: 'Dr.ssa Laura Verdi',
-    },
-    {
-      id: 4,
-      title: 'Gestione del Tempo e Priorità',
-      category: 'productivity',
-      type: 'interactive',
-      duration: '18 min',
-      difficulty: 'Principiante',
-      status: 'published',
-      views: 2341,
-      lastUpdated: '5 giorni fa',
-      author: 'Dr.ssa Maria Bianchi',
-    },
-    {
-      id: 5,
-      title: 'Meditazione Guidata per il Sonno',
-      category: 'mindfulness',
-      type: 'audio',
-      duration: '30 min',
-      difficulty: 'Principiante',
-      status: 'review',
-      views: 0,
-      lastUpdated: '1 giorno fa',
-      author: 'Dr. Marco Rossi',
-    },
-  ];
+  const guides: any[] = [];
 
   const filteredGuides = guides.filter((guide) => {
     const matchesSearch = guide.title.toLowerCase().includes(searchTerm.toLowerCase());
