@@ -436,9 +436,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 10,
-    minHeight: 56,
+    paddingTop: 20,
+    paddingBottom: 16,
+    minHeight: 80,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
@@ -449,12 +449,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   headerSmall: {
-    minHeight: 48,
+    minHeight: 72,
     paddingHorizontal: 12,
+    paddingTop: 16,
   },
   headerMedium: {
-    minHeight: 64,
+    minHeight: 88,
     paddingHorizontal: 20,
+    paddingTop: 18,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -557,6 +559,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    paddingTop: 16,
     padding: 16,
   },
   quickNav: {
