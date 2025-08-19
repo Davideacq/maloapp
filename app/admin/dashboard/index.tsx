@@ -10,10 +10,12 @@ import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
+import { useScreenSize } from '../../../src/hooks/use-screen-size';
 
 export default function AdminDashboard() {
   console.log('AdminDashboard page loaded');
   
+  const { isSmallScreen, isMediumScreen } = useScreenSize();
   const [searchTerm, setSearchTerm] = useState('');
 
   const stats = {
@@ -81,35 +83,66 @@ export default function AdminDashboard() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Navigation */}
-      <View style={styles.header}>
+      <View style={[
+        styles.header,
+        isSmallScreen && styles.headerSmall,
+        isMediumScreen && styles.headerMedium
+      ]}>
         <View style={styles.headerLeft}>
-          <Image
-            source={require('../../../assets/images/malo-logo-dark.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <Pressable 
+            style={styles.logoContainer}
+            onPress={() => handleNavigation('/admin/dashboard')}
+          >
+            <Image
+              source={require('../../../assets/images/malo-logo-dark.png')}
+              style={[
+                styles.logo,
+                isSmallScreen && styles.logoSmall
+              ]}
+              resizeMode="contain"
+            />
+          </Pressable>
         </View>
-        <View style={styles.headerCenter}>
+        <View style={[
+          styles.headerCenter,
+          isSmallScreen && styles.headerCenterSmall
+        ]}>
           <Breadcrumb
             items={[
               { label: 'Dashboard' },
             ]}
+            variant="compact"
           />
         </View>
-        <View style={styles.headerRight}>
+        <View style={[
+          styles.headerRight,
+          isSmallScreen && styles.headerRightSmall
+        ]}>
           <Pressable 
             onPress={() => handleNavigation('/admin/companies/create')} 
-            style={styles.headerButton}
+            style={({ pressed }) => [
+              styles.headerButton,
+              isSmallScreen && styles.headerButtonSmall,
+              pressed && styles.buttonPressed
+            ]}
           >
-            <Ionicons name="add-circle" size={20} color="white" />
-            <Text style={styles.headerButtonText}>Nuova Azienda</Text>
+            <Ionicons name="add-circle" size={isSmallScreen ? 16 : 20} color="white" />
+            {!isSmallScreen && (
+              <Text style={styles.headerButtonText}>Nuova Azienda</Text>
+            )}
           </Pressable>
           <Pressable 
             onPress={() => handleNavigation('/admin/settings')} 
-            style={styles.headerButtonOutline}
+            style={({ pressed }) => [
+              styles.headerButtonOutline,
+              isSmallScreen && styles.headerButtonOutlineSmall,
+              pressed && styles.buttonPressed
+            ]}
           >
-            <Ionicons name="settings-outline" size={20} color="#374151" />
-            <Text style={styles.headerButtonTextOutline}>Impostazioni</Text>
+            <Ionicons name="settings-outline" size={isSmallScreen ? 16 : 20} color="#374151" />
+            {!isSmallScreen && (
+              <Text style={styles.headerButtonTextOutline}>Impostazioni</Text>
+            )}
           </Pressable>
         </View>
       </View>
@@ -402,29 +435,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 10,
+    minHeight: 56,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  headerSmall: {
+    minHeight: 48,
+    paddingHorizontal: 12,
+  },
+  headerMedium: {
+    minHeight: 64,
+    paddingHorizontal: 20,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  logoContainer: {
+    padding: 4,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
   logo: {
     width: 120,
     height: 32,
+  },
+  logoSmall: {
+    width: 100,
+    height: 26,
   },
   headerCenter: {
     flex: 1,
     alignItems: 'center',
   },
+  headerCenterSmall: {
+    flex: 0.8,
+  },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  headerRightSmall: {
+    gap: 8,
   },
   headerButton: {
     flexDirection: 'row',
@@ -434,6 +496,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: '#3b82f6',
     borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  headerButtonSmall: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
   headerButtonText: {
     color: 'white',
@@ -450,11 +521,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1d5db',
     borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  headerButtonOutlineSmall: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
   headerButtonTextOutline: {
     color: '#374151',
     fontSize: 14,
     fontWeight: '500',
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   buttonIcon: {
     marginRight: 4,

@@ -11,15 +11,18 @@ import {
     Text,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../../src/components/avatar';
 import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
+import { useScreenSize } from '../../../src/hooks/use-screen-size';
 import { getUser } from '../../../src/utils/auth';
 import { api } from '../../../src/utils/api';
 
 export default function PsychologistDashboard() {
+  const { isSmallScreen, isMediumScreen } = useScreenSize();
   const [userName, setUserName] = useState<string>('');
   const [stats, setStats] = useState({
     activePatients: 0,
@@ -160,70 +163,108 @@ export default function PsychologistDashboard() {
 
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-        {/* Header Navigation */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+      {/* Header Navigation */}
+      <View style={[
+        styles.header,
+        isSmallScreen && styles.headerSmall,
+        isMediumScreen && styles.headerMedium
+      ]}>
+        <View style={styles.headerLeft}>
+          <Pressable 
+            style={styles.logoContainer}
+            onPress={() => handleNavigation('/psychologist/dashboard')}
+          >
             <Image
               source={require('../../../assets/images/malo-logo-dark.png')}
-              style={styles.logo}
+              style={[
+                styles.logo,
+                isSmallScreen && styles.logoSmall
+              ]}
               resizeMode="contain"
             />
-          </View>
-          <View style={styles.headerCenter}>
-            <Breadcrumb
-              items={[
-                { label: 'Dashboard' },
-              ]}
-            />
-          </View>
-          <View style={styles.headerRight}>
-            <Pressable 
-              style={styles.calendarButton}
-              onPress={() => handleNavigation('/psychologist/calendar')}
-            >
-              <Ionicons name="calendar" size={20} color="#3b82f6" />
+          </Pressable>
+        </View>
+        <View style={[
+          styles.headerCenter,
+          isSmallScreen && styles.headerCenterSmall
+        ]}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard' },
+            ]}
+            variant="compact"
+          />
+        </View>
+        <View style={[
+          styles.headerRight,
+          isSmallScreen && styles.headerRightSmall
+        ]}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.calendarButton,
+              isSmallScreen && styles.calendarButtonSmall,
+              pressed && styles.buttonPressed
+            ]}
+            onPress={() => handleNavigation('/psychologist/calendar')}
+          >
+            <Ionicons name="calendar" size={isSmallScreen ? 16 : 20} color="#3b82f6" />
+            {!isSmallScreen && (
               <Text style={styles.calendarButtonText}>Calendario</Text>
-              {stats.todaySessions > 0 && (
-                <View style={styles.calendarIndicator}>
-                  <Text style={styles.indicatorText}>{stats.todaySessions}</Text>
-                </View>
-              )}
-            </Pressable>
-            
-            <Pressable 
-              style={styles.notificationButton} 
-              onPress={() => setShowNotifications(true)}
+            )}
+            {stats.todaySessions > 0 && (
+              <View style={styles.calendarIndicator}>
+                <Text style={styles.indicatorText}>{stats.todaySessions}</Text>
+              </View>
+            )}
+          </Pressable>
+          
+          <Pressable 
+            style={({ pressed }) => [
+              styles.notificationButton,
+              isSmallScreen && styles.notificationButtonSmall,
+              pressed && styles.buttonPressed
+            ]} 
+            onPress={() => setShowNotifications(true)}
+          >
+            <Ionicons name="notifications" size={isSmallScreen ? 16 : 20} color="#1e40af" />
+            {notifications.filter(n => !n.isRead).length > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.badgeText}>
+                  {notifications.filter(n => !n.isRead).length}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+          
+          <View style={styles.profileContainer}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.profileButton,
+                pressed && styles.profileButtonPressed
+              ]}
+              onPress={() => handleNavigation('/psychologist/profile')}
             >
-              <Ionicons name="notifications" size={20} color="#1e40af" />
-              {notifications.filter(n => !n.isRead).length > 0 && (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.badgeText}>
-                    {notifications.filter(n => !n.isRead).length}
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-            
-            <View style={styles.profileContainer}>
-              <Pressable
-                onPress={() => handleNavigation('/psychologist/profile')}
-                style={styles.profileButton}
-              >
-                <View style={styles.profileInfo}>
-                  <Avatar
-                    alt={userName || 'Account'}
-                    size="md"
-                    variant="primary"
-                  />
+              <View style={[
+                styles.profileInfo,
+                isSmallScreen && styles.profileInfoSmall
+              ]}>
+                <Avatar
+                  alt={userName || 'Account'}
+                  size={isSmallScreen ? "sm" : "md"}
+                  variant="primary"
+                />
+                {!isSmallScreen && (
                   <Text style={styles.userName}>{userName || 'Account'}</Text>
-                </View>
-              </Pressable>
-            </View>
+                )}
+              </View>
+            </Pressable>
           </View>
         </View>
+      </View>
 
+      {/* Scrollable Content */}
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Stats Cards */}
         <View style={styles.statsGrid}>
           <Card style={StyleSheet.flatten([styles.statCard, styles.tealCard])}>
@@ -369,6 +410,7 @@ export default function PsychologistDashboard() {
           </CardContent>
         </Card>
       </ScrollView>
+      
       <NotificationMenu
         visible={showNotifications}
         onClose={() => setShowNotifications(false)}
@@ -376,7 +418,7 @@ export default function PsychologistDashboard() {
         onMarkAsRead={handleMarkAsRead}
         onDelete={handleDelete}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -385,6 +427,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9fafb',
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     paddingBottom: 32,
   },
@@ -392,12 +437,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 20,
     paddingBottom: 16,
+    minHeight: 80,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  headerSmall: {
+    minHeight: 72,
+    paddingHorizontal: 12,
+    paddingTop: 16,
+  },
+  headerMedium: {
+    minHeight: 88,
+    paddingHorizontal: 20,
+    paddingTop: 18,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -408,14 +470,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  headerCenterSmall: {
+    flex: 0.5,
+  },
+  logoContainer: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
   logo: {
     width: 120,
     height: 32,
+  },
+  logoSmall: {
+    width: 100,
+    height: 26,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
+  },
+  headerRightSmall: {
+    gap: 8,
   },
   // Stili legacy per compatibilità (da rimuovere in futuro)
   headerButton: {
@@ -445,6 +522,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   profileContainer: {
     position: 'relative',
@@ -452,6 +534,12 @@ const styles = StyleSheet.create({
   },
   profileButton: {
     cursor: 'pointer',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  profileButtonPressed: {
+    opacity: 0.7,
+    backgroundColor: '#f3f4f6',
   },
   profileInfo: {
     flexDirection: 'row',
@@ -461,11 +549,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     justifyContent: 'center',
+    borderRadius: 8,
+  },
+  profileInfoSmall: {
+    height: 30,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
   },
   userName: {
     fontSize: 14,
     fontWeight: '500',
     color: '#374151',
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 
   statsGrid: {
@@ -732,6 +830,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#dbeafe',
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  calendarButtonSmall: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
   },
   calendarButtonText: {
     fontSize: 14,
@@ -751,6 +858,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   indicatorText: {
     fontSize: 11,
@@ -767,6 +879,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#dbeafe',
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  notificationButtonSmall: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
   },
   badgeText: {
     fontSize: 11,

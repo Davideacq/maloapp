@@ -411,11 +411,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   dropdownOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
     zIndex: 999,
   },
   dropdownMenu: {

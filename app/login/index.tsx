@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useTypography } from '../../src/hooks/use-typography';
 import { saveAuth } from '../../src/utils/auth';
+import { api } from '../../src/utils/api';
 
 interface ButtonProps {
   title: string;
@@ -60,33 +61,24 @@ export default function LoginPage() {
       return;
     }
 
-    // Chiamata API locale (WAMP) senza client HTTP centralizzato
+    // Chiamata API tramite client centralizzato (usa EXPO_PUBLIC_API_URL)
     try {
-      // PRODUZIONE:
-      // - Imposta l'URL base via variabile d'ambiente `EXPO_PUBLIC_API_URL` (es. https://api.tuodominio.com/api)
-      // - Abilita CORS nel backend per gli origin di produzione e forza HTTPS
-      // - Se non usi sottocartelle tipo "/backend_maloapp/public", usa percorsi puliti "/api"
-      // - Ricorda di rimuovere eventuali fallback/URL hardcoded per il deploy
-      const API_BASE = 'http://127.0.0.1:8000/api';
-      const response = await fetch(`${API_BASE}/auth/login`, {
+      const res = await api.raw('/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ email, password })
+        body: { email, password },
+        withAuth: false,
       });
 
-      const data = await response.json();
-
-      if (data?.success) {
+      // res.ok è true quando HTTP è ok e json.success !== false
+      if (res.ok && res.data) {
+        const payload = res.data as any; // contiene { token, token_type, user }
         await saveAuth({
-          token: data.data.token,
-          token_type: data.data.token_type,
-          user: data.data.user,
+          token: payload.token,
+          token_type: payload.token_type,
+          user: payload.user,
         });
 
-        const userRole = data.data.user.role as 'user' | 'admin' | 'psychologist';
+        const userRole = payload.user.role as 'user' | 'admin' | 'psychologist';
         if (userRole === 'admin') {
           router.replace('/admin/dashboard');
         } else if (userRole === 'psychologist') {
@@ -95,7 +87,7 @@ export default function LoginPage() {
           router.replace('/user/dashboard');
         }
       } else {
-        setErrorMessage(data?.message || 'Credenziali non valide');
+        setErrorMessage(res.message || 'Credenziali non valide');
       }
     } catch (e: any) {
       setErrorMessage(e?.message || 'Errore durante il login');
