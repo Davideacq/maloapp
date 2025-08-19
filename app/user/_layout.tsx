@@ -171,7 +171,8 @@ export default function UserLayout() {
   return (
     <UserAvatarContext.Provider value={{ avatar, setAvatar }}>
     <SafeAreaView style={styles.container}>
-      {/* Top Header - Always visible */}
+      {/* Top Header - Hidden on mobile (bottom navigation) */}
+      {!useBottomNavigation && (
       <View style={[
         styles.header,
         isSmallScreen && styles.headerSmall,
@@ -285,6 +286,7 @@ export default function UserLayout() {
           </View>
         </View>
       </View>
+      )}
 
       {/* Main Content */}
       <View style={styles.content}>
