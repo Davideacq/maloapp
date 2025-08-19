@@ -46,51 +46,51 @@ const ImageCardOverlay: React.FC<ImageCardOverlayProps> = ({
     );
   }
 
-  // Layout desktop: overlay sull'immagine
+  // Layout desktop: overlay sull'immagine con fallback per LinearGradient
   return (
-    <View style={[
-      styles.container, 
-      style
-    ]}>
+    <View style={[styles.container, style]}>
       <Image source={image} style={styles.backgroundImage} resizeMode="cover" />
-      <LinearGradient
-        colors={['transparent', 'rgba(0, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.7)', 'rgba(0, 0, 0, 0.9)']}
-        locations={[0, 0.3, 0.7, 1]}
-        style={styles.overlay}
-      >
-        <View style={[
-          styles.overlayContent,
-          styles.overlayContentHorizontal
-        ]}>
+      {/* Fallback per quando LinearGradient non è disponibile */}
+      <View style={styles.overlayFallback}>
+        <LinearGradient
+          colors={['transparent', 'rgba(0, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.7)', 'rgba(0, 0, 0, 0.9)']}
+          locations={[0, 0.3, 0.7, 1]}
+          style={styles.overlay}
+        >
           <View style={[
-            styles.textContent,
-            styles.textContentHorizontal
+            styles.overlayContent,
+            styles.overlayContentHorizontal
           ]}>
-            <Text style={[
-              styles.title,
-              styles.titleLarge
-            ]}>{title}</Text>
-            {subtitle && <Text style={[
-              styles.subtitle,
-              styles.subtitleLarge
-            ]}>{subtitle}</Text>}
+            <View style={[
+              styles.textContent,
+              styles.textContentHorizontal
+            ]}>
+              <Text style={[
+                styles.title,
+                styles.titleLarge
+              ]}>{title}</Text>
+              {subtitle && <Text style={[
+                styles.subtitle,
+                styles.subtitleLarge
+              ]}>{subtitle}</Text>}
+            </View>
+            {buttonText && onButtonPress && (
+              <Pressable 
+                style={[
+                  styles.button,
+                  styles.buttonHorizontal
+                ]} 
+                onPress={onButtonPress}
+              >
+                <View style={styles.buttonContent}>
+                  <Text style={styles.buttonText}>{buttonText}</Text>
+                  <Ionicons name="arrow-forward" size={16} color="white" />
+                </View>
+              </Pressable>
+            )}
           </View>
-          {buttonText && onButtonPress && (
-            <Pressable 
-              style={[
-                styles.button,
-                styles.buttonHorizontal
-              ]} 
-              onPress={onButtonPress}
-            >
-              <View style={styles.buttonContent}>
-                <Text style={styles.buttonText}>{buttonText}</Text>
-                <Ionicons name="arrow-forward" size={16} color="white" />
-              </View>
-            </Pressable>
-          )}
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+      </View>
     </View>
   );
 };
@@ -164,12 +164,20 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  overlay: {
+  overlayFallback: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     top: '30%',
+    justifyContent: 'flex-end',
+  },
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    top: 0,
     justifyContent: 'flex-end',
   },
   overlayContent: {
