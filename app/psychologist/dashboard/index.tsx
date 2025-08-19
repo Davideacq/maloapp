@@ -17,14 +17,14 @@ import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
 import { getUser } from '../../../src/utils/auth';
+import { api } from '../../../src/utils/api';
 
 export default function PsychologistDashboard() {
   const [userName, setUserName] = useState<string>('');
-  const [stats] = useState({
-    activePatients: 18,
-    todaySessions: 6,
-    weekSessions: 18,
-    completedSessions: 142,
+  const [stats, setStats] = useState({
+    activePatients: 0,
+    todaySessions: 0,
+    completedSessions: 0,
   });
 
   // Stato per il modal notifiche
@@ -142,6 +142,17 @@ export default function PsychologistDashboard() {
         setUserName(fullName || 'Account');
       } else {
         setUserName('Account');
+      }
+      // Fetch live stats
+      const res = await api.get<{ active_patients: number; sessions_today: number; sessions_completed: number }>(
+        '/psychologists/stats/me'
+      );
+      if (res.ok && res.data) {
+        setStats({
+          activePatients: (res.data as any).active_patients ?? 0,
+          todaySessions: (res.data as any).sessions_today ?? 0,
+          completedSessions: (res.data as any).sessions_completed ?? 0,
+        });
       }
     })();
   }, []);
