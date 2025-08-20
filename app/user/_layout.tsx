@@ -365,6 +365,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 16,
     minHeight: 80,
+
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
@@ -395,10 +396,12 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     backgroundColor: 'transparent',
+
   },
   logo: {
     width: 120,
     height: 32,
+]
   },
   logoSmall: {
     width: 100,
@@ -572,6 +575,7 @@ const styles = StyleSheet.create({
   notificationButtonSmall: {
     paddingHorizontal: 10,
     paddingVertical: 8,
+
   },
   notificationBadge: {
     position: 'absolute',
@@ -590,7 +594,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 3,
-  },
+        },
   notificationBadgeText: {
     fontSize: 11,
     fontWeight: '700',

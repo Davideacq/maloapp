@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -187,6 +186,7 @@ export default function PsychologistCalendarPage() {
             <Ionicons name="add" size={20} color="#1e40af" />
             <Text style={styles.calendarButtonText}>Nuovo</Text>
           </Pressable>
+
         </View>
       </View>
 
@@ -403,6 +403,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   logo: {
     width: 120,
     height: 32,
