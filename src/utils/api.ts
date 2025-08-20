@@ -1,7 +1,14 @@
 import { getToken } from './auth';
+import Constants from 'expo-constants';
+
+const extraApiUrl = (Constants?.expoConfig as any)?.extra?.apiUrl
+  || (Constants as any)?.manifest2?.extra?.apiUrl
+  || (Constants as any)?.manifest?.extra?.apiUrl;
 
 export const API_BASE: string =
-  (process.env.EXPO_PUBLIC_API_URL as string) || 'http://127.0.0.1:8000/api';
+  (process.env.EXPO_PUBLIC_API_URL as string)
+  || (extraApiUrl as string)
+  || 'http://127.0.0.1:8000/api';
 
 export type ApiResult<T = any> = {
   ok: boolean;
@@ -30,7 +37,8 @@ async function request<T = any>(
       if (token) authHeader['Authorization'] = token;
     }
 
-    const response = await fetch(`${API_BASE}${path}`, {
+    const url = `${API_BASE}${path}`;
+    const response = await fetch(url, {
       method,
       headers: {
         'Accept': 'application/json',
@@ -41,26 +49,82 @@ async function request<T = any>(
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    let json: any = null;
-    try {
-      json = await response.json();
-    } catch (_) {
-      // ignore JSON parse errors, keep json as null
+    const contentType = response.headers.get('content-type') || '';
+    let parsedBody: any = null;
+    let parseError: any = null;
+
+    if (contentType.includes('application/json')) {
+      try {
+        parsedBody = await response.json();
+      } catch (err) {
+        parseError = err;
+      }
+    } else {
+      // try to read as text for non-JSON responses (e.g., HTML errors)
+      try {
+        const text = await response.text();
+        parsedBody = text;
+      } catch (err) {
+        parseError = err;
+      }
     }
 
-    const ok = response.ok && (json?.success !== false);
+    const successFlag = typeof parsedBody === 'object' && parsedBody !== null
+      ? parsedBody.success
+      : undefined;
+    const ok = response.ok && (successFlag !== false);
+
+    // Extract a human-readable message
+    let message: string | undefined = undefined;
+    if (typeof parsedBody === 'object' && parsedBody !== null) {
+      // Laravel-style { message, errors }
+      const bodyMessage = parsedBody.message as string | undefined;
+      const errorsObj = parsedBody.errors as Record<string, string[] | string> | undefined;
+      if (errorsObj) {
+        const lines: string[] = [];
+        Object.entries(errorsObj).forEach(([field, msgs]) => {
+          const msgArray = Array.isArray(msgs) ? msgs : [msgs];
+          msgArray.forEach((m) => lines.push(`${field}: ${m}`));
+        });
+        message = lines.join('\n');
+      } else if (bodyMessage) {
+        message = bodyMessage;
+      }
+    } else if (typeof parsedBody === 'string') {
+      // plain text response
+      message = parsedBody.slice(0, 500);
+    }
+
+    if (!ok && !message) {
+      // Fallback by status
+      if (response.status === 0) message = 'Errore di rete';
+      else if (response.status === 401) message = 'Non autorizzato';
+      else if (response.status === 403) message = 'Accesso negato';
+      else if (response.status === 404) message = 'Risorsa non trovata';
+      else if (response.status === 422) message = 'Dati non validi';
+      else if (response.status >= 500) message = 'Errore del server';
+      else message = 'Richiesta fallita';
+    }
+
     return {
       ok,
       status: response.status,
-      data: json?.data ?? json,
-      raw: json,
-      message: json?.message || (!ok ? 'Request failed' : undefined),
+      data: typeof parsedBody === 'object' ? (parsedBody?.data ?? parsedBody) : undefined,
+      raw: parsedBody ?? parseError,
+      message,
     } as ApiResult<T>;
   } catch (e: any) {
+    // Improve the network error message for RN/Expo
+    const errMsg = typeof e?.message === 'string' ? e.message : 'Errore di rete';
+    let advice = '';
+    if (/Network request failed/i.test(errMsg)) {
+      advice = `Impossibile raggiungere il server. Verifica connessione e la variabile EXPO_PUBLIC_API_URL (attuale: ${API_BASE}).`;
+    }
     return {
       ok: false,
       status: 0,
-      message: e?.message || 'Network error',
+      message: advice ? `${errMsg}. ${advice}` : errMsg,
+      raw: e,
     };
   }
 }

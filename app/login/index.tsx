@@ -17,6 +17,7 @@ import {
 import { useTypography } from '../../src/hooks/use-typography';
 import { saveAuth } from '../../src/utils/auth';
 import { api } from '../../src/utils/api';
+import { API_BASE } from '../../src/utils/api';
 
 interface ButtonProps {
   title: string;
@@ -49,15 +50,18 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   
 
   const handleLogin = async () => {
     // Clear any previous error
     setErrorMessage('');
+    setIsSubmitting(true);
 
     if (!email || !password) {
       setErrorMessage('Inserisci email e password');
+      setIsSubmitting(false);
       return;
     }
 
@@ -87,10 +91,19 @@ export default function LoginPage() {
           router.replace('/user/dashboard');
         }
       } else {
-        setErrorMessage(res.message || 'Credenziali non valide');
+        // Costruisci un messaggio d'errore più specifico
+        let details = '';
+        if (res.status && res.status !== 0) {
+          details = ` (HTTP ${res.status})`;
+        }
+        const baseMsg = res.message || 'Credenziali non valide';
+        setErrorMessage(`${baseMsg}${details}`);
       }
     } catch (e: any) {
+      console.error('Errore login:', e);
       setErrorMessage(e?.message || 'Errore durante il login');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -200,6 +213,7 @@ export default function LoginPage() {
                 title="Accedi"
                 onPress={handleLogin}
                 backgroundColor="#f97316" // orange-500
+                disabled={isSubmitting}
               />
 
               {/* Error Message */}
@@ -207,6 +221,14 @@ export default function LoginPage() {
                 <View style={styles.errorContainer}>
                   <Ionicons name="alert-circle" size={16} color="#ef4444" />
                   <Text style={[styles.errorText, typography.bodySmall]}>{errorMessage}</Text>
+                </View>
+              ) : null}
+
+              {__DEV__ ? (
+                <View style={{ marginTop: 8 }}>
+                  <Text style={[{ color: '#9ca3af', textAlign: 'center' }, typography.caption]}>
+                    API: {API_BASE}
+                  </Text>
                 </View>
               ) : null}
 
