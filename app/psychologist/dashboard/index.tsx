@@ -164,104 +164,7 @@ export default function PsychologistDashboard() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
-      {/* Header Navigation */}
-      <View style={[
-        styles.header,
-        isSmallScreen && styles.headerSmall,
-        isMediumScreen && styles.headerMedium
-      ]}>
-        <View style={styles.headerLeft}>
-          <Pressable 
-            style={styles.logoContainer}
-            onPress={() => handleNavigation('/psychologist/dashboard')}
-          >
-            <Image
-              source={require('../../../assets/images/malo-logo-dark.png')}
-              style={[
-                styles.logo,
-                isSmallScreen && styles.logoSmall
-              ]}
-              resizeMode="contain"
-            />
-          </Pressable>
-        </View>
-        <View style={[
-          styles.headerCenter,
-          isSmallScreen && styles.headerCenterSmall
-        ]}>
-          <Breadcrumb
-            items={[
-              { label: 'Dashboard' },
-            ]}
-            variant="compact"
-          />
-        </View>
-        <View style={[
-          styles.headerRight,
-          isSmallScreen && styles.headerRightSmall
-        ]}>
-          <Pressable 
-            style={({ pressed }) => [
-              styles.calendarButton,
-              isSmallScreen && styles.calendarButtonSmall,
-              pressed && styles.buttonPressed
-            ]}
-            onPress={() => handleNavigation('/psychologist/calendar')}
-          >
-            <Ionicons name="calendar" size={isSmallScreen ? 16 : 20} color="#3b82f6" />
-            {!isSmallScreen && (
-              <Text style={styles.calendarButtonText}>Calendario</Text>
-            )}
-            {stats.todaySessions > 0 && (
-              <View style={styles.calendarIndicator}>
-                <Text style={styles.indicatorText}>{stats.todaySessions}</Text>
-              </View>
-            )}
-          </Pressable>
-          
-          <Pressable 
-            style={({ pressed }) => [
-              styles.notificationButton,
-              isSmallScreen && styles.notificationButtonSmall,
-              pressed && styles.buttonPressed
-            ]} 
-            onPress={() => setShowNotifications(true)}
-          >
-            <Ionicons name="notifications" size={isSmallScreen ? 16 : 20} color="#1e40af" />
-            {notifications.filter(n => !n.isRead).length > 0 && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.badgeText}>
-                  {notifications.filter(n => !n.isRead).length}
-                </Text>
-              </View>
-            )}
-          </Pressable>
-          
-          <View style={styles.profileContainer}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.profileButton,
-                pressed && styles.profileButtonPressed
-              ]}
-              onPress={() => handleNavigation('/psychologist/profile')}
-            >
-              <View style={[
-                styles.profileInfo,
-                isSmallScreen && styles.profileInfoSmall
-              ]}>
-                <Avatar
-                  alt={userName || 'Account'}
-                  size={isSmallScreen ? "sm" : "md"}
-                  variant="primary"
-                />
-                {!isSmallScreen && (
-                  <Text style={styles.userName}>{userName || 'Account'}</Text>
-                )}
-              </View>
-            </Pressable>
-          </View>
-        </View>
-      </View>
+      {/* Header removed on mobile to use bottom tab navigation */}
 
       {/* Scrollable Content */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -435,32 +338,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 16,
-    minHeight: 80,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-    zIndex: 1000,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  headerSmall: {
-    minHeight: 72,
-    paddingHorizontal: 12,
-    paddingTop: 16,
-  },
-  headerMedium: {
-    minHeight: 88,
-    paddingHorizontal: 20,
-    paddingTop: 18,
+    // removed (header not used on mobile)
   },
   headerLeft: {
     flexDirection: 'row',
@@ -470,22 +348,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  headerCenterSmall: {
-    flex: 0.5,
-  },
-  logoContainer: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: 'transparent',
-  },
-  logo: {
-    width: 120,
-    height: 32,
-  },
-  logoSmall: {
-    width: 100,
-    height: 26,
   },
   headerRight: {
     flexDirection: 'row',
@@ -510,24 +372,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#3b82f6',
     marginLeft: 6,
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#ef4444',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
   },
   profileContainer: {
     position: 'relative',
@@ -820,79 +664,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'white',
     textAlign: 'center',
-  },
-  calendarButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: '#eff6ff',
-    borderWidth: 1,
-    borderColor: '#dbeafe',
-    position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  calendarButtonSmall: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  calendarButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e40af',
-    marginLeft: 8,
-  },
-  calendarIndicator: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#14b5e2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-  },
-  indicatorText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: 'white',
-  },
-  notificationButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: '#eff6ff',
-    borderWidth: 1,
-    borderColor: '#dbeafe',
-    position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  notificationButtonSmall: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: 'white',
   },
 }); 
