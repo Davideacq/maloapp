@@ -15,6 +15,9 @@ import {
   View
 } from 'react-native';
 import { useTypography } from '../../src/hooks/use-typography';
+import { saveAuth } from '../../src/utils/auth';
+import { api } from '../../src/utils/api';
+import { API_BASE } from '../../src/utils/api';
 
 interface ButtonProps {
   title: string;
@@ -47,70 +50,60 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const getUserTypeFromEmail = (email: string): 'user' | 'admin' | 'psychologist' | null => {
-    const emailLower = email.toLowerCase();
-    
-    if (emailLower === 'admin@test') {
-      return 'admin';
-    } else if (emailLower === 'psi@test') {
-      return 'psychologist';
-    } else if (emailLower === 'user@test') {
-      return 'user';
-    }
-    
-    // Default logic for other emails
-    if (emailLower.includes('admin')) {
-      return 'admin';
-    } else if (emailLower.includes('psi') || emailLower.includes('psychologist')) {
-      return 'psychologist';
-    } else {
-      return 'user';
-    }
-  };
+  
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Clear any previous error
     setErrorMessage('');
+    setIsSubmitting(true);
 
     if (!email || !password) {
       setErrorMessage('Inserisci email e password');
+      setIsSubmitting(false);
       return;
     }
 
-    // TODO: Rimuovere prima della prod
-    // Check backdoor credentials first
-    if (email.toLowerCase() === 'dev' && password === '2554') {
-      console.log('Backdoor login successful for Piccio');
-      // Navigate to admin dashboard as default for backdoor access
-      router.replace('/admin/dashboard');
-      return;
-    }
+    // Chiamata API tramite client centralizzato (usa EXPO_PUBLIC_API_URL)
+    try {
+      const res = await api.raw('/auth/login', {
+        method: 'POST',
+        body: { email, password },
+        withAuth: false,
+      });
 
-    // Check test credentials
-    const emailLower = email.toLowerCase();
-    const testCredentials: Record<string, string> = {
-      'admin@test': 'test',
-      'psi@test': 'test',
-      'user@test': 'test'
-    };
+      // res.ok è true quando HTTP è ok e json.success !== false
+      if (res.ok && res.data) {
+        const payload = res.data as any; // contiene { token, token_type, user }
+        await saveAuth({
+          token: payload.token,
+          token_type: payload.token_type,
+          user: payload.user,
+        });
 
-    if (testCredentials[emailLower] && password === testCredentials[emailLower]) {
-      // Valid test credentials
-      const userType = getUserTypeFromEmail(email);
-      console.log('Login successful:', { email, userType });
-      
-      // Navigate based on user type
-      if (userType === 'user') {
-        router.replace('/user/dashboard');
-      } else if (userType === 'admin') {
-        router.replace('/admin/dashboard');
-      } else if (userType === 'psychologist') {
-        router.replace('/psychologist/dashboard');
+        const userRole = payload.user.role as 'user' | 'admin' | 'psychologist';
+        if (userRole === 'admin') {
+          router.replace('/admin/dashboard');
+        } else if (userRole === 'psychologist') {
+          router.replace('/psychologist/dashboard');
+        } else {
+          router.replace('/user/dashboard');
+        }
+      } else {
+        // Costruisci un messaggio d'errore più specifico
+        let details = '';
+        if (res.status && res.status !== 0) {
+          details = ` (HTTP ${res.status})`;
+        }
+        const baseMsg = res.message || 'Credenziali non valide';
+        setErrorMessage(`${baseMsg}${details}`);
       }
-    } else {
-      // Show error for incorrect credentials
-      setErrorMessage('Le credenziali inserite non sono corrette. Verifica email e password e riprova.');
+    } catch (e: any) {
+      console.error('Errore login:', e);
+      setErrorMessage(e?.message || 'Errore durante il login');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -220,6 +213,7 @@ export default function LoginPage() {
                 title="Accedi"
                 onPress={handleLogin}
                 backgroundColor="#f97316" // orange-500
+                disabled={isSubmitting}
               />
 
               {/* Error Message */}
@@ -227,6 +221,14 @@ export default function LoginPage() {
                 <View style={styles.errorContainer}>
                   <Ionicons name="alert-circle" size={16} color="#ef4444" />
                   <Text style={[styles.errorText, typography.bodySmall]}>{errorMessage}</Text>
+                </View>
+              ) : null}
+
+              {__DEV__ ? (
+                <View style={{ marginTop: 8 }}>
+                  <Text style={[{ color: '#9ca3af', textAlign: 'center' }, typography.caption]}>
+                    API: {API_BASE}
+                  </Text>
                 </View>
               ) : null}
 

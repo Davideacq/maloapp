@@ -3,113 +3,59 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Badge } from '../../../src/components/badge';
 import { Breadcrumb } from '../../../src/components/breadcrumb';
-import { Button } from '../../../src/components/button';
 import { Card, CardContent } from '../../../src/components/card';
 
 export default function PsychologistNotesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState('all');
 
-  const patients = [
-    { id: 'all', name: 'Tutti i pazienti' },
-    { id: 'mario-rossi', name: 'Mario Rossi' },
-    { id: 'laura-bianchi', name: 'Laura Bianchi' },
-    { id: 'giuseppe-verdi', name: 'Giuseppe Verdi' },
-    { id: 'anna-moretti', name: 'Anna Moretti' },
-  ];
-
-  const notes = [
-    {
-      id: 1,
-      patient: 'Mario Rossi',
-      company: 'Azienda SpA',
-      sessionDate: '12 Gen 2024',
-      sessionNumber: 4,
-      duration: '50 min',
-      type: 'Sessione Individuale',
-      status: 'completed',
-      title: 'Progressi nella gestione dello stress',
-      content: 'Ottimi progressi nell\'applicazione delle tecniche di respirazione. Il paziente riferisce una riduzione significativa dei livelli di stress lavorativo. Continua a praticare regolarmente gli esercizi assegnati.',
-      objectives: ['Consolidare tecniche apprese', 'Lavorare sulla comunicazione assertiva'],
-      nextSession: '15 Gen 2024',
-    },
-    {
-      id: 2,
-      patient: 'Laura Bianchi',
-      company: 'Tech Solutions',
-      sessionDate: '11 Gen 2024',
-      sessionNumber: 2,
-      duration: '50 min',
-      type: 'Sessione Individuale',
-      status: 'completed',
-      title: 'Work-life balance e gestione del tempo',
-      content: 'Lavoro sui confini tra vita lavorativa e personale. Identificate strategie pratiche per migliorare l\'organizzazione della giornata. Discussione sulle priorità e delegazione.',
-      objectives: ['Implementare strategie time management', 'Stabilire routine serale'],
-      nextSession: '16 Gen 2024',
-    },
-  ];
+  const notes: any[] = [];
 
   const stats = {
     totalNotes: notes.length,
-    completedNotes: notes.filter(n => n.status === 'completed').length,
-    draftNotes: notes.filter(n => n.status === 'draft').length,
-    pendingNotes: notes.filter(n => n.status === 'pending').length,
-  };
-
-  const handleNavigation = (path: string) => {
-    router.push(path as any);
+    completedNotes: 0,
+    draftNotes: 0,
+    pendingNotes: 0,
   };
 
   const handleBackToDashboard = () => {
     router.push('/psychologist/dashboard' as any);
   };
-
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'success';
-      case 'draft':
-        return 'warning';
-      case 'pending':
-        return 'info';
-      default:
-        return 'info';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'Completata';
-      case 'draft':
-        return 'Bozza';
-      case 'pending':
-        return 'In attesa';
-      default:
-        return 'In attesa';
-    }
-  };
+  
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', onPress: handleBackToDashboard },
-            { label: 'Note Cliniche' },
-          ]}
-        />
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: handleBackToDashboard },
+              { label: 'Note Cliniche' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Pressable onPress={() => {}} style={styles.calendarButton}>
+            <Ionicons name="add" size={20} color="#1e40af" />
+            <Text style={styles.calendarButtonText}>Nuova Nota</Text>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           {/* Stats Cards */}
           <View style={styles.statsGrid}>
-            <Card style={[styles.statCard, styles.tealCard]}>
+            <Card style={StyleSheet.flatten([styles.statCard, styles.tealCard])}>
               <CardContent style={styles.statCardContent}>
                 <View style={[styles.statIcon, styles.tealIcon]}>
                   <Ionicons name="document-text" size={24} color="white" />
@@ -119,7 +65,7 @@ export default function PsychologistNotesPage() {
               </CardContent>
             </Card>
 
-            <Card style={[styles.statCard, styles.successCard]}>
+            <Card style={StyleSheet.flatten([styles.statCard, styles.successCard])}>
               <CardContent style={styles.statCardContent}>
                 <View style={[styles.statIcon, styles.successIcon]}>
                   <Ionicons name="checkmark-done" size={24} color="white" />
@@ -145,58 +91,13 @@ export default function PsychologistNotesPage() {
 
           {/* Notes List */}
           <View style={styles.notesList}>
-            {notes.map((note) => (
-              <Card key={note.id} style={styles.noteCard}>
+            {notes.length === 0 && (
+              <Card style={styles.noteCard}>
                 <CardContent style={styles.noteCardContent}>
-                  <View style={styles.noteHeader}>
-                    <View style={styles.noteHeaderLeft}>
-                      <Text style={styles.noteTitle}>{note.title}</Text>
-                      <View style={styles.noteMetadata}>
-                        <View style={styles.metadataItem}>
-                          <Ionicons name="person" size={14} color="#6b7280" />
-                          <Text style={styles.metadataText}>{note.patient}</Text>
-                        </View>
-                        <View style={styles.metadataItem}>
-                          <Ionicons name="business" size={14} color="#6b7280" />
-                          <Text style={styles.metadataText}>{note.company}</Text>
-                        </View>
-                        <View style={styles.metadataItem}>
-                          <Ionicons name="calendar" size={14} color="#6b7280" />
-                          <Text style={styles.metadataText}>{note.sessionDate}</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <Badge variant={getStatusVariant(note.status)}>
-                      {getStatusLabel(note.status)}
-                    </Badge>
-                  </View>
-
-                  <Text style={styles.noteContent}>{note.content}</Text>
-
-                  <View style={styles.noteFooter}>
-                    <View style={styles.sessionInfo}>
-                      <Text style={styles.sessionInfoText}>
-                        Sessione #{note.sessionNumber} • {note.duration} • {note.type}
-                      </Text>
-                    </View>
-                    <View style={styles.noteActions}>
-                      <Button 
-                        onPress={() => {}} 
-                        style={styles.actionButton}
-                      >
-                        <Text style={styles.actionButtonText}>Visualizza</Text>
-                      </Button>
-                      <Button 
-                        onPress={() => {}} 
-                        style={[styles.actionButton, styles.editButton]}
-                      >
-                        <Text style={styles.editButtonText}>Modifica</Text>
-                      </Button>
-                    </View>
-                  </View>
+                  <Text style={styles.noteContent}>Nessuna nota disponibile</Text>
                 </CardContent>
               </Card>
-            ))}
+            )}
           </View>
         </View>
       </ScrollView>
@@ -211,12 +112,32 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: '#f3f4f6',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  logo: {
+    width: 120,
+    height: 32,
   },
   backButton: {
     flexDirection: 'row',
@@ -247,6 +168,23 @@ const styles = StyleSheet.create({
     maxWidth: 1200,
     alignSelf: 'center',
     width: '100%',
+  },
+  calendarButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+    position: 'relative',
+  },
+  calendarButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e40af',
+    marginLeft: 8,
   },
   statsGrid: {
     flexDirection: 'row',

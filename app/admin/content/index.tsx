@@ -3,9 +3,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -15,74 +16,9 @@ export default function AdminContentPage() {
 
   const categories = [
     { id: 'all', label: 'Tutti i contenuti' },
-    { id: 'stress', label: 'Gestione Stress' },
-    { id: 'mindfulness', label: 'Mindfulness' },
-    { id: 'communication', label: 'Comunicazione' },
-    { id: 'productivity', label: 'Produttività' },
   ];
 
-  const guides = [
-    {
-      id: 1,
-      title: 'Tecniche di Respirazione per Ridurre lo Stress',
-      category: 'stress',
-      type: 'video',
-      duration: '15 min',
-      difficulty: 'Principiante',
-      status: 'published',
-      views: 1234,
-      lastUpdated: '2 giorni fa',
-      author: 'Dr.ssa Maria Bianchi',
-    },
-    {
-      id: 2,
-      title: 'Mindfulness per la Concentrazione',
-      category: 'mindfulness',
-      type: 'audio',
-      duration: '20 min',
-      difficulty: 'Intermedio',
-      status: 'published',
-      views: 856,
-      lastUpdated: '1 settimana fa',
-      author: 'Dr. Marco Rossi',
-    },
-    {
-      id: 3,
-      title: 'Comunicazione Assertiva',
-      category: 'communication',
-      type: 'article',
-      duration: '25 min',
-      difficulty: 'Intermedio',
-      status: 'draft',
-      views: 0,
-      lastUpdated: '3 giorni fa',
-      author: 'Dr.ssa Laura Verdi',
-    },
-    {
-      id: 4,
-      title: 'Gestione del Tempo e Priorità',
-      category: 'productivity',
-      type: 'interactive',
-      duration: '18 min',
-      difficulty: 'Principiante',
-      status: 'published',
-      views: 2341,
-      lastUpdated: '5 giorni fa',
-      author: 'Dr.ssa Maria Bianchi',
-    },
-    {
-      id: 5,
-      title: 'Meditazione Guidata per il Sonno',
-      category: 'mindfulness',
-      type: 'audio',
-      duration: '30 min',
-      difficulty: 'Principiante',
-      status: 'review',
-      views: 0,
-      lastUpdated: '1 giorno fa',
-      author: 'Dr. Marco Rossi',
-    },
-  ];
+  const guides: any[] = [];
 
   const filteredGuides = guides.filter((guide) => {
     const matchesSearch = guide.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -144,16 +80,31 @@ export default function AdminContentPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Button onPress={() => handleNavigation('/admin/dashboard')} variant="outline" size="sm">
-              <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
-              <Text style={styles.backButtonText}>Dashboard</Text>
-            </Button>
-            <Text style={styles.headerTitle}>Gestione Contenuti</Text>
-          </View>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
+              { label: 'Gestione Contenuti' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/content/create')} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="add-circle" size={20} color="white" />
+            <Text style={styles.headerButtonText}>Nuova Guida</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -329,21 +280,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#3b82f6',
+    borderRadius: 8,
+  },
+  headerButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
   headerTitle: {
     fontSize: 20,

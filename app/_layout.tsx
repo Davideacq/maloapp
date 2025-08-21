@@ -3,6 +3,7 @@
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useCustomFonts } from '../src/hooks/use-fonts';
 
@@ -11,6 +12,12 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { fontsLoaded, error } = useCustomFonts();
+
+  // Load global CSS only on web
+  if (Platform.OS === 'web') {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('../global.css');
+  }
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {

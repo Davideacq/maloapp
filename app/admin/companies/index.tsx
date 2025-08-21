@@ -3,9 +3,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent } from '../../../src/components/card';
 import { Input } from '../../../src/components/input';
 
@@ -192,16 +193,32 @@ export default function AdminCompaniesPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <Pressable onPress={handleBackToDashboard} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#3b82f6" />
-          <Text style={styles.backText}>Dashboard</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>Gestione Aziende</Text>
-        <Pressable onPress={handleCreateCompany} style={styles.createButton}>
-          <Ionicons name="add" size={20} color="#3b82f6" />
-        </Pressable>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: handleBackToDashboard },
+              { label: 'Gestione Aziende' },
+            ]}
+          />
+        </View>
+        <View style={styles.headerRight}>
+          <Pressable 
+            onPress={handleCreateCompany} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="add-circle" size={20} color="white" />
+            <Text style={styles.headerButtonText}>Nuova Azienda</Text>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView style={styles.content}>
@@ -284,12 +301,45 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: '#f3f4f6',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#3b82f6',
+    borderRadius: 8,
+  },
+  headerButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
   backButton: {
     flexDirection: 'row',
