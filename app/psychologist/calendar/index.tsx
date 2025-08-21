@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 
 export default function PsychologistCalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
