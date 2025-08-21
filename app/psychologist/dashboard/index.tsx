@@ -166,6 +166,7 @@ export default function PsychologistDashboard() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       {/* Header removed on mobile to use bottom tab navigation */}
 
+
       {/* Scrollable Content */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Stats Cards */}
@@ -357,6 +358,7 @@ const styles = StyleSheet.create({
   headerRightSmall: {
     gap: 8,
   },
+
   // Stili legacy per compatibilità (da rimuovere in futuro)
   headerButton: {
     flexDirection: 'row',
@@ -664,5 +666,56 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'white',
     textAlign: 'center',
+  },
+  calendarButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+    position: 'relative',
+  },
+  calendarButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e40af',
+    marginLeft: 8,
+  },
+  calendarIndicator: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#14b5e2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+  },
+  indicatorText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: 'white',
+  },
+  notificationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+    position: 'relative',
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: 'white',
   },
 }); 

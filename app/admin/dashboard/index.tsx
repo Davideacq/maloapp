@@ -83,6 +83,7 @@ export default function AdminDashboard() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Navigation */}
+
       <View style={[
         styles.header,
         isSmallScreen && styles.headerSmall,
@@ -144,6 +145,7 @@ export default function AdminDashboard() {
               <Text style={styles.headerButtonTextOutline}>Impostazioni</Text>
             )}
           </Pressable>
+
         </View>
       </View>
 
@@ -435,6 +437,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+
     paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 16,
@@ -458,10 +461,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 18,
   },
+
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   logoContainer: {
     padding: 4,
     borderRadius: 8,
@@ -481,6 +486,7 @@ const styles = StyleSheet.create({
   },
   headerCenterSmall: {
     flex: 0.8,
+
   },
   headerRight: {
     flexDirection: 'row',
@@ -489,6 +495,7 @@ const styles = StyleSheet.create({
   },
   headerRightSmall: {
     gap: 8,
+
   },
   headerButton: {
     flexDirection: 'row',
