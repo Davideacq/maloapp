@@ -60,11 +60,11 @@ export default function UserDashboard() {
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
       {/* Breadcrumb */}
-      <Breadcrumb
+      {/* <Breadcrumb
         items={[
           { label: 'Dashboard' },
         ]}
-      />
+      /> */}
       {/* Stats Cards */}
       <View style={[
         styles.statsGrid,

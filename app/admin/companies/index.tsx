@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Alert, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent } from '../../../src/components/card';
 import { Input } from '../../../src/components/input';
 
@@ -203,12 +203,13 @@ export default function AdminCompaniesPage() {
           />
         </View>
         <View style={styles.headerCenter}>
-          <Breadcrumb
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
             items={[
               { label: 'Dashboard', onPress: handleBackToDashboard },
               { label: 'Gestione Aziende' },
             ]}
-          />
+          /> */}
         </View>
         <View style={styles.headerRight}>
           <Pressable 

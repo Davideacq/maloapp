@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AppIcon } from '../../../src/components/app-icon';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent } from '../../../src/components/card';
 import { useScreenSize } from '../../../src/hooks/use-screen-size';
@@ -177,12 +177,13 @@ export default function SessionsPage() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
-        <Breadcrumb
+        {/* Breadcrumb - Removed for mobile app */}
+        {/* <Breadcrumb
           items={[
             { label: 'Home', onPress: handleBackToDashboard },
             { label: 'Le Mie Sessioni' },
           ]}
-        />
+        /> */}
         {/* Qui puoi aggiungere un bottone a destra se necessario, come in /user/profile */}
       </View>
 

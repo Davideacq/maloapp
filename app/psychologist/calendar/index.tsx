@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 
 export default function PsychologistCalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -175,12 +175,13 @@ export default function PsychologistCalendarPage() {
           />
         </View>
         <View style={styles.headerCenter}>
-          <Breadcrumb
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
             items={[
               { label: 'Dashboard', onPress: handleBackToDashboard },
               { label: 'Calendario' },
             ]}
-          />
+          /> */}
         </View>
         <View style={styles.headerRight}>
           <Pressable onPress={() => {}} style={styles.calendarButton}>

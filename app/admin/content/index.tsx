@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
@@ -90,12 +90,13 @@ export default function AdminContentPage() {
           />
         </View>
         <View style={styles.headerCenter}>
-          <Breadcrumb
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
             items={[
               { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
               { label: 'Gestione Contenuti' },
             ]}
-          />
+          /> */}
         </View>
         <View style={styles.headerRight}>
           <Pressable 
