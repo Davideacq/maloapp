@@ -6,7 +6,7 @@ import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppIcon } from '../../../../src/components/app-icon';
-import { Breadcrumb } from '../../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../../src/components/breadcrumb';
 import { Card, CardContent } from '../../../../src/components/card';
 
 const travelImage = require('../../../../assets/images/travel.jpg');
@@ -85,13 +85,14 @@ Pratica queste tecniche regolarmente per ottenere i migliori risultati. Ricorda 
 
   return (
     <SafeAreaView style={styles.container}>
-      <Breadcrumb
+      {/* Breadcrumb - Removed for mobile app */}
+      {/* <Breadcrumb
         items={[
           { label: 'Home', onPress: handleBackToDashboard },
           { label: 'Guide Personalizzate', onPress: handleBackToGuides },
           { label: guide.title },
         ]}
-      />
+      /> */}
 
       <ScrollView style={styles.scrollView}>
         {/* Cover Image */}
@@ -151,31 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9fafb',
   },
-  breadcrumbContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 8,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  breadcrumbLink: {
-    color: '#3b82f6',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  breadcrumbSeparator: {
-    color: '#6b7280',
-    fontSize: 15,
-  },
-  breadcrumbCurrent: {
-    color: '#111827',
-    fontWeight: '500',
-    fontSize: 15,
-    flexShrink: 1,
-  },
+
   scrollView: {
     flex: 1,
   },

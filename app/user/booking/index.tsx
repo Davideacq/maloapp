@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader } from '../../../src/components/card';
 import { useIsMobile } from '../../../src/hooks/use-mobile';
@@ -65,12 +65,13 @@ export default function BookingPage() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Breadcrumb
+        {/* Breadcrumb - Removed for mobile app */}
+        {/* <Breadcrumb
           items={[
             { label: 'Home', onPress: handleBackToDashboard },
             { label: 'Prenota una Sessione' },
           ]}
-        />
+        /> */}
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>

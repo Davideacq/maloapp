@@ -9,13 +9,20 @@ export interface BreadcrumbItem {
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[];
+  variant?: 'default' | 'compact';
 }
 
 // Componente Breadcrumb riutilizzabile e responsivo
-export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
+export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, variant = 'default' }) => {
   const isWebMobile = Platform.OS === 'web' && typeof window !== 'undefined' && window.innerWidth <= 600;
   return (
-    <View style={[styles.container, isWebMobile && { paddingVertical: 8, minHeight: 32 }]}> {/* minHeight più bassa su mobile web */}
+    <View
+      style={[
+        styles.container,
+        variant === 'compact' && styles.compactContainer,
+        isWebMobile && { paddingVertical: 8, minHeight: 32 },
+      ]}
+    >
       {items.map((item, idx) => (
         <React.Fragment key={item.label + idx}>
           {item.onPress ? (
@@ -43,6 +50,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     minHeight: 48,
+  },
+  compactContainer: {
+    marginBottom: 0,
+    paddingVertical: 8,
+    minHeight: 32,
   },
   link: {
     paddingHorizontal: 4,

@@ -2,7 +2,7 @@
 // Psychologist dashboard with patients management and session tracking for React Native
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Image,
     Pressable,
@@ -11,16 +11,23 @@ import {
     Text,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Avatar } from '../../../src/components/avatar';
 import { Badge } from '../../../src/components/badge';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { Notification, NotificationMenu } from '../../../src/components/notification-menu';
+import { useScreenSize } from '../../../src/hooks/use-screen-size';
+import { getUser } from '../../../src/utils/auth';
+import { api } from '../../../src/utils/api';
 
 export default function PsychologistDashboard() {
-  const [stats] = useState({
-    totalPatients: 24,
-    todaySessions: 6,
-    weekSessions: 18,
-    completedSessions: 142,
+  const { isSmallScreen, isMediumScreen } = useScreenSize();
+  const [userName, setUserName] = useState<string>('');
+  const [stats, setStats] = useState({
+    activePatients: 0,
+    todaySessions: 0,
+    completedSessions: 0,
   });
 
   // Stato per il modal notifiche
@@ -66,37 +73,61 @@ export default function PsychologistDashboard() {
       id: 1,
       name: 'Mario Rossi',
       company: 'Azienda SpA',
-      lastSession: 'Oggi',
+      department: 'HR',
+      lastSession: 'Oggi, 15:00',
+      nextSession: 'Giovedì, 14:30',
       remaining: 7,
       totalSessions: 12,
-      notes: 'Progressi nella gestione dello stress',
+      completedSessions: 5,
+      status: 'active',
+      category: 'Gestione Stress',
+      lastActivity: 'Completata sessione su tecniche di respirazione',
+      progress: 42, // percentuale completamento
     },
     {
       id: 2,
       name: 'Laura Bianchi',
       company: 'Tech Solutions',
-      lastSession: 'Ieri',
+      department: 'Sviluppo',
+      lastSession: 'Ieri, 16:00',
+      nextSession: 'Venerdì, 10:00',
       remaining: 4,
       totalSessions: 10,
-      notes: 'Lavoro su work-life balance',
+      completedSessions: 6,
+      status: 'active',
+      category: 'Work-Life Balance',
+      lastActivity: 'Discussione su confini lavoro-vita privata',
+      progress: 60,
     },
     {
       id: 3,
       name: 'Giuseppe Verdi',
       company: 'Marketing Pro',
+      department: 'Marketing',
       lastSession: '3 giorni fa',
+      nextSession: 'Lunedì, 11:00',
       remaining: 8,
       totalSessions: 8,
-      notes: 'Primo colloquio completato',
+      completedSessions: 0,
+      status: 'new',
+      category: 'Primo Colloquio',
+      lastActivity: 'Valutazione iniziale completata',
+      progress: 0,
     },
     {
       id: 4,
       name: 'Anna Moretti',
       company: 'Finance Corp',
+      department: 'Contabilità',
       lastSession: '1 settimana fa',
+      nextSession: 'Martedì, 17:00',
       remaining: 2,
       totalSessions: 15,
-      notes: 'Fase conclusiva del percorso',
+      completedSessions: 13,
+      status: 'concluding',
+      category: 'Gestione Ansia',
+      lastActivity: 'Preparazione per fase conclusiva',
+      progress: 87,
     },
   ];
 
@@ -104,75 +135,48 @@ export default function PsychologistDashboard() {
     router.push(path as any);
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('');
-  };
+  useEffect(() => {
+    (async () => {
+      const user = await getUser();
+      if (user) {
+        const fullName = user.full_name && user.full_name.length > 0
+          ? user.full_name
+          : `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim();
+        setUserName(fullName || 'Account');
+      } else {
+        setUserName('Account');
+      }
+      // Fetch live stats
+      const res = await api.get<{ active_patients: number; sessions_today: number; sessions_completed: number }>(
+        '/psychologists/stats/me'
+      );
+      if (res.ok && res.data) {
+        setStats({
+          activePatients: (res.data as any).active_patients ?? 0,
+          todaySessions: (res.data as any).sessions_today ?? 0,
+          completedSessions: (res.data as any).sessions_completed ?? 0,
+        });
+      }
+    })();
+  }, []);
+
+
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-        {/* Header Navigation */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Image
-              source={require('../../../assets/images/malo-logo-dark.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={styles.headerRight}>
-            <Pressable 
-              style={styles.calendarButton}
-              onPress={() => handleNavigation('/psychologist/calendar')}
-            >
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+      {/* Header removed on mobile to use bottom tab navigation */}
 
-              <Ionicons name="calendar" size={20} color="#3b82f6" />
-              <Text style={styles.calendarButtonText}>Calendario</Text>
-              {stats.todaySessions > 0 && (
-                <View style={styles.calendarIndicator}>
-                  <Text style={styles.indicatorText}>{stats.todaySessions}</Text>
-                </View>
-              )}
 
-            </Pressable>
-            
-            <Pressable 
-              style={styles.notificationButton} 
-              onPress={() => setShowNotifications(true)}
-            >
-              <Ionicons name="notifications" size={20} color="#1e40af" />
-              {notifications.filter(n => !n.isRead).length > 0 && (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.badgeText}>
-                    {notifications.filter(n => !n.isRead).length}
-                  </Text>
-                </View>
-
-              )}
-            </Pressable>
-            
-            <Pressable 
-              style={styles.avatar}
-              onPress={() => handleNavigation('/psychologist/profile')}
-            >
-              <View style={styles.avatarCircle}>
-                <Text style={styles.avatarText}>MB</Text>
-              </View>
-            </Pressable>
-          </View>
-        </View>
-
+      {/* Scrollable Content */}
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Stats Cards */}
         <View style={styles.statsGrid}>
           <Card style={StyleSheet.flatten([styles.statCard, styles.tealCard])}>
             <CardContent style={styles.statCardContent}>
               <View style={styles.statCardInner}>
                 <View>
-                  <Text style={[styles.statLabel, styles.tealLabel]}>Pazienti Totali</Text>
-                  <Text style={[styles.statValue, styles.tealValue]}>{stats.totalPatients}</Text>
+                  <Text style={[styles.statLabel, styles.tealLabel]}>Pazienti Attivi</Text>
+                  <Text style={[styles.statValue, styles.tealValue]}>{stats.activePatients}</Text>
                 </View>
                 <View style={[styles.statIcon, styles.tealIcon]}>
                   <Ionicons name="people" size={24} color="white" />
@@ -199,7 +203,7 @@ export default function PsychologistDashboard() {
             <CardContent style={styles.statCardContent}>
               <View style={styles.statCardInner}>
                 <View>
-                  <Text style={[styles.statLabel, styles.successLabel]}>Completate</Text>
+                  <Text style={[styles.statLabel, styles.successLabel]}>Sessioni Completate</Text>
                   <Text style={[styles.statValue, styles.successValue]}>{stats.completedSessions}</Text>
                 </View>
                 <View style={[styles.statIcon, styles.successIcon]}>
@@ -209,33 +213,6 @@ export default function PsychologistDashboard() {
             </CardContent>
           </Card>
         </View>
-
-        {/* Recent Patients */}
-        <Card style={styles.patientsCard}>
-          <CardHeader>
-            <CardTitle style={styles.cardTitle}>Pazienti Recenti</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.patientsList}>
-              {recentPatients.map((patient) => (
-                <View key={patient.id} style={styles.patientItem}>
-                  <View style={styles.patientAvatar}>
-                    <Text style={styles.patientInitials}>{getInitials(patient.name)}</Text>
-                  </View>
-                  <View style={styles.patientInfo}>
-                    <Text style={styles.patientName}>{patient.name}</Text>
-                    <Text style={styles.patientCompany}>{patient.company}</Text>
-                    <Text style={styles.patientNotes}>{patient.notes}</Text>
-                  </View>
-                  <View style={styles.patientStats}>
-                    <Text style={styles.patientRemaining}>{patient.remaining} rimanenti</Text>
-                    <Text style={styles.patientLastSession}>{patient.lastSession}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </CardContent>
-        </Card>
 
         {/* Quick Actions */}
         <View style={styles.actionsGrid}>
@@ -259,7 +236,85 @@ export default function PsychologistDashboard() {
             <Text style={styles.actionText}>Calendario</Text>
           </Pressable>
         </View>
+
+        {/* Recent Patients */}
+        <Card style={styles.patientsCard}>
+          <CardHeader>
+            <CardTitle style={styles.cardTitle}>Pazienti Recenti</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <View style={styles.patientsList}>
+              {recentPatients.map((patient) => (
+                <View key={patient.id} style={styles.patientItem}>
+                  <View style={styles.patientHeader}>
+                    <Avatar
+                      alt={patient.name}
+                      size="sm"
+                    />
+                    <View style={styles.patientInfo}>
+                      <View style={styles.patientNameRow}>
+                        <Text style={styles.patientName}>{patient.name}</Text>
+                        <Badge 
+                          variant={patient.status === 'active' ? 'success' : 
+                                   patient.status === 'new' ? 'secondary' : 'warning'}
+                          style={styles.statusBadge}
+                        >
+                          {patient.status === 'active' ? 'Attivo' : 
+                           patient.status === 'new' ? 'Nuovo' : 'Conclusione'}
+                        </Badge>
+                      </View>
+                      <Text style={styles.patientCompany}>{patient.company} • {patient.department}</Text>
+                      <Text style={styles.patientCategory}>{patient.category}</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.patientProgress}>
+                    <View style={styles.progressHeader}>
+                      <Text style={styles.progressText}>Progresso: {patient.progress}%</Text>
+                      <Text style={styles.sessionsText}>{patient.completedSessions}/{patient.totalSessions} sessioni</Text>
+                    </View>
+                    <View style={styles.progressBar}>
+                      <View style={[styles.progressFill, { width: `${patient.progress}%` }]} />
+                    </View>
+                  </View>
+                  
+                  <View style={styles.patientActivity}>
+                    <Text style={styles.lastActivityLabel}>Ultima attività:</Text>
+                    <Text style={styles.lastActivityText}>{patient.lastActivity}</Text>
+                  </View>
+                  
+                  <View style={styles.patientSessions}>
+                    <View style={styles.sessionInfo}>
+                      <Text style={styles.sessionLabel}>Ultima sessione:</Text>
+                      <Text style={styles.sessionText}>{patient.lastSession}</Text>
+                    </View>
+                    <View style={styles.sessionInfo}>
+                      <Text style={styles.sessionLabel}>Prossima sessione:</Text>
+                      <Text style={styles.sessionText}>{patient.nextSession}</Text>
+                    </View>
+                    <View style={styles.sessionInfo}>
+                      <Text style={styles.sessionLabel}>Sessioni rimanenti:</Text>
+                      <Text style={styles.sessionText}>{patient.remaining}</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.patientActions}>
+                    <Pressable style={styles.patientActionButton}>
+                      <Ionicons name="calendar" size={16} color="#3b82f6" />
+                      <Text style={styles.actionButtonText}>Calendario</Text>
+                    </Pressable>
+                    <Pressable style={styles.patientActionButton}>
+                      <Ionicons name="document-text" size={16} color="#10b981" />
+                      <Text style={styles.actionButtonText}>Note</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </CardContent>
+        </Card>
       </ScrollView>
+      
       <NotificationMenu
         visible={showNotifications}
         onClose={() => setShowNotifications(false)}
@@ -267,7 +322,7 @@ export default function PsychologistDashboard() {
         onMarkAsRead={handleMarkAsRead}
         onDelete={handleDelete}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -276,33 +331,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9fafb',
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
+    paddingTop: 16,
     paddingBottom: 32,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    // removed (header not used on mobile)
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logo: {
-    width: 120,
-    height: 32,
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
   },
+  headerRightSmall: {
+    gap: 8,
+  },
+
   // Stili legacy per compatibilità (da rimuovere in futuro)
   headerButton: {
     flexDirection: 'row',
@@ -319,36 +375,44 @@ const styles = StyleSheet.create({
     color: '#3b82f6',
     marginLeft: 6,
   },
-  notificationBadge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#ef4444',
+  profileContainer: {
+    position: 'relative',
+    zIndex: 1001,
+  },
+  profileButton: {
+    cursor: 'pointer',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  profileButtonPressed: {
+    opacity: 0.7,
+    backgroundColor: '#f3f4f6',
+  },
+  profileInfo: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    height: 40,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'white',
-
+    borderRadius: 8,
   },
-  avatar: {
-    marginLeft: 8,
+  profileInfoSmall: {
+    height: 30,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
   },
-  avatarCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#3b82f6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
+  userName: {
     fontSize: 14,
-    fontWeight: '600',
-    color: 'white',
+    fontWeight: '500',
+    color: '#374151',
   },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
+  },
+
   statsGrid: {
     flexDirection: 'row',
     gap: 12,
@@ -435,28 +499,113 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   patientItem: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#f9fafb',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  patientHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#f9fafb',
-  },
-  patientAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#3b82f6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  patientInitials: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: 'white',
+    marginBottom: 12,
   },
   patientInfo: {
     flex: 1,
+  },
+  patientNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  statusBadge: {
+    marginLeft: 8,
+  },
+  patientCategory: {
+    fontSize: 12,
+    color: '#8b5cf6',
+    fontWeight: '500',
+  },
+  patientProgress: {
+    marginBottom: 12,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  progressText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  sessionsText: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  progressBar: {
+    height: 6,
+    backgroundColor: '#e5e7eb',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#10b981',
+    borderRadius: 3,
+  },
+  patientActivity: {
+    marginBottom: 12,
+  },
+  lastActivityLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 2,
+  },
+  lastActivityText: {
+    fontSize: 12,
+    color: '#6b7280',
+    lineHeight: 16,
+  },
+  patientSessions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  sessionInfo: {
+    flex: 1,
+  },
+  sessionLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 2,
+  },
+  sessionText: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  patientActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  patientActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    backgroundColor: '#f3f4f6',
+  },
+  actionButtonText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#374151',
   },
   patientName: {
     fontSize: 16,

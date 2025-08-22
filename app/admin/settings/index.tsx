@@ -3,9 +3,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppIcon } from '../../../src/components/app-icon';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { logoutUser } from '../../../src/utils/auth';
@@ -33,18 +34,26 @@ export default function AdminSettingsPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header Navigation */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <Button onPress={() => handleNavigation('/admin/dashboard')} variant="outline" size="sm">
-              <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
-              <Text style={styles.backButtonText}>Dashboard</Text>
-            </Button>
-            <Text style={styles.headerTitle}>Impostazioni</Text>
-          </View>
-          {/* Bottone Logout */}
-          <Button
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../../../assets/images/malo-logo-dark.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.headerCenter}>
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
+              { label: 'Impostazioni' },
+            ]}
+          /> */}
+        </View>
+        <View style={styles.headerRight}>
+          <Pressable 
             onPress={() => {
               Alert.alert(
                 'Logout',
@@ -62,13 +71,11 @@ export default function AdminSettingsPage() {
                 ]
               );
             }}
-            variant="destructive"
-            size="sm"
-            style={{ marginLeft: 12 }}
+            style={styles.headerButtonOutline}
           >
-            <Ionicons name="log-out-outline" size={16} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Logout</Text>
-          </Button>
+            <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+            <Text style={styles.headerButtonTextOutline}>Logout</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -271,21 +278,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+  },
+  logo: {
+    width: 120,
+    height: 32,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerButtonOutline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#ef4444',
+    borderRadius: 8,
+  },
+  headerButtonTextOutline: {
+    color: '#ef4444',
+    fontSize: 14,
+    fontWeight: '500',
   },
   headerTitle: {
     fontSize: 20,

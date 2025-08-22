@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
+import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { ImageCardCarousel } from '../../../src/components/image-card-carousel';
 import { useScreenSize } from '../../../src/hooks/use-screen-size';
@@ -58,6 +59,12 @@ export default function UserDashboard() {
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      {/* Breadcrumb */}
+      {/* <Breadcrumb
+        items={[
+          { label: 'Dashboard' },
+        ]}
+      /> */}
       {/* Stats Cards */}
       <View style={[
         styles.statsGrid,

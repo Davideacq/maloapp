@@ -2,124 +2,111 @@
 // Admin users management with filtering, search, and comprehensive user info for React Native
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
+import { api, ApiResult } from '../../../src/utils/api';
+import { formatDateIT, formatDateTimeIT } from '../../../src/utils/date';
 
 export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCompany, setSelectedCompany] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedStatus] = useState('all');
+  const [page, setPage] = useState(1);
 
-  const companies = [
-    { id: 'all', name: 'Tutte le aziende' },
-    { id: 'azienda-spa', name: 'Azienda SpA' },
-    { id: 'tech-solutions', name: 'Tech Solutions' },
-    { id: 'marketing-pro', name: 'Marketing Pro' },
-    { id: 'finance-corp', name: 'Finance Corp' },
-  ];
-
-  const users = [
-    {
-      id: 1,
-      firstName: 'Mario',
-      lastName: 'Rossi',
-      email: 'mario.rossi@azienda.com',
-      company: 'Azienda SpA',
-      department: 'Marketing',
-      joinDate: '15 Gen 2024',
-      lastLogin: '2 ore fa',
-      sessionsUsed: 4,
-      totalSessions: 12,
-      status: 'active',
-    },
-    {
-      id: 2,
-      firstName: 'Laura',
-      lastName: 'Bianchi',
-      email: 'laura.bianchi@techsolutions.com',
-      company: 'Tech Solutions',
-      department: 'Sviluppo',
-      joinDate: '10 Gen 2024',
-      lastLogin: '1 giorno fa',
-      sessionsUsed: 2,
-      totalSessions: 10,
-      status: 'active',
-    },
-    {
-      id: 3,
-      firstName: 'Giuseppe',
-      lastName: 'Verdi',
-      email: 'giuseppe.verdi@marketingpro.com',
-      company: 'Marketing Pro',
-      department: 'Vendite',
-      joinDate: '8 Gen 2024',
-      lastLogin: '3 giorni fa',
-      sessionsUsed: 0,
-      totalSessions: 8,
-      status: 'inactive',
-    },
-    {
-      id: 4,
-      firstName: 'Anna',
-      lastName: 'Moretti',
-      email: 'anna.moretti@financecorp.com',
-      company: 'Finance Corp',
-      department: 'Finanza',
-      joinDate: '5 Gen 2024',
-      lastLogin: '1 settimana fa',
-      sessionsUsed: 8,
-      totalSessions: 15,
-      status: 'active',
-    },
-    {
-      id: 5,
-      firstName: 'Marco',
-      lastName: 'Ferrari',
-      email: 'marco.ferrari@azienda.com',
-      company: 'Azienda SpA',
-      department: 'HR',
-      joinDate: '3 Gen 2024',
-      lastLogin: '5 ore fa',
-      sessionsUsed: 6,
-      totalSessions: 12,
-      status: 'active',
-    },
-  ];
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesCompany =
-      selectedCompany === 'all' || user.company.toLowerCase().replace(/\s+/g, '-') === selectedCompany;
-
-    const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus;
-
-    return matchesSearch && matchesCompany && matchesStatus;
-  });
-
-  const stats = {
-    totalUsers: users.length,
-    activeUsers: users.filter((u) => u.status === 'active').length,
-    inactiveUsers: users.filter((u) => u.status === 'inactive').length,
-    newThisMonth: users.filter((u) => u.joinDate.includes('Gen 2024')).length,
+  type ApiCompany = { id: number; name: string };
+  type ApiUser = {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    role: 'admin' | 'psychologist' | 'user';
+    status: 'active' | 'inactive' | 'suspended';
+    company_id?: number | null;
+    full_name?: string;
+    last_login?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+    company?: ApiCompany | null;
   };
+
+  type Pagination = {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+
+  const [users, setUsers] = useState<ApiUser[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Companies filter options will be loaded and wired later
+
+  // Server-driven list; we keep the name for minimal UI changes
+  const filteredUsers = users;
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params: Record<string, string> = {
+        per_page: '20',
+        page: String(page),
+      };
+      if (searchTerm.trim().length > 0) params.search = searchTerm.trim();
+      if (selectedStatus !== 'all') params.status = selectedStatus;
+      // NOTE: selectedCompany in this UI is a slug; until we wire real companies, we skip company_id
+      const qs = new URLSearchParams(params).toString();
+      const res: ApiResult<{ success: boolean; data: ApiUser[] }> = await api.get(`/users?${qs}`);
+      if (!res.ok) {
+        throw new Error(res.message || 'Errore nel caricamento utenti');
+      }
+      const list = (res.data as unknown as ApiUser[]) || [];
+      setUsers(list);
+      // Try to read pagination from raw if present
+      const pg = (res.raw && (res.raw as any).pagination) as Pagination | undefined;
+      setPagination(pg ?? null);
+    } catch (e: any) {
+      setError(typeof e?.message === 'string' ? e.message : 'Errore sconosciuto');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, selectedStatus, page]);
+
+  const stats = useMemo(() => {
+    const totalUsers = pagination?.total ?? users.length;
+    const activeUsers = users.filter((u) => u.status === 'active').length;
+    const inactiveUsers = users.filter((u) => u.status === 'inactive').length;
+    const now = new Date();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    const newThisMonth = users.filter((u) => {
+      if (!u.created_at) return false;
+      const d = new Date(u.created_at.replace(' ', 'T'));
+      return d.getMonth() === month && d.getFullYear() === year;
+    }).length;
+    return { totalUsers, activeUsers, inactiveUsers, newThisMonth };
+  }, [users, pagination]);
 
   const handleNavigation = (path: string) => {
     router.push(path as any);
   };
 
   const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName[0]}${lastName[0]}`;
+    return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase();
   };
 
   const getProgressPercentage = (used: number, total: number) => {
+    if (!total || total <= 0) return 0;
     return (used / total) * 100;
   };
 
@@ -232,7 +219,7 @@ export default function AdminUsersPage() {
               <View>
                 <CardTitle style={styles.cardTitle}>Utenti Registrati</CardTitle>
                 <Text style={styles.cardDescription}>
-                  {filteredUsers.length} di {users.length} utenti
+                  {filteredUsers.length} di {pagination?.total ?? filteredUsers.length} utenti
                 </Text>
               </View>
               <Button variant="outline" size="sm" onPress={() => {}}>
@@ -242,7 +229,18 @@ export default function AdminUsersPage() {
             </View>
           </CardHeader>
           <CardContent>
-            {filteredUsers.length > 0 ? (
+            {error ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="warning" size={48} color="#ef4444" style={styles.emptyIcon} />
+                <Text style={styles.emptyTitle}>Errore</Text>
+                <Text style={styles.emptyDescription}>{error}</Text>
+              </View>
+            ) : loading ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="reload" size={32} color="#9ca3af" style={styles.emptyIcon} />
+                <Text style={styles.emptyDescription}>Caricamento utenti…</Text>
+              </View>
+            ) : filteredUsers.length > 0 ? (
               <View style={styles.usersTable}>
                 {/* Table Header */}
                 <View style={styles.tableHeader}>
@@ -256,18 +254,18 @@ export default function AdminUsersPage() {
                 
                 {/* Table Rows */}
                 <View style={styles.tableBody}>
-                  {filteredUsers.map((user) => (
+                  {filteredUsers.map((user: ApiUser) => (
                     <View key={user.id} style={styles.tableRow}>
                       <View style={[styles.tableCell, styles.userColumn]}>
                         <View style={styles.userInfo}>
                           <View style={styles.userAvatar}>
                             <Text style={styles.userInitials}>
-                              {getInitials(user.firstName, user.lastName)}
+                              {getInitials(user.first_name, user.last_name)}
                             </Text>
                           </View>
                           <View style={styles.userDetails}>
                             <Text style={styles.userName}>
-                              {user.firstName} {user.lastName}
+                              {user.first_name} {user.last_name}
                             </Text>
                             <Text style={styles.userEmail}>{user.email}</Text>
                           </View>
@@ -275,13 +273,13 @@ export default function AdminUsersPage() {
                       </View>
                       
                       <View style={[styles.tableCell, styles.companyColumn]}>
-                        <Text style={styles.companyName}>{user.company}</Text>
-                        <Text style={styles.departmentName}>{user.department}</Text>
+                        <Text style={styles.companyName}>{user.company?.name ?? '-'}</Text>
+                        <Text style={styles.departmentName}>-</Text>
                       </View>
                       
                       <View style={[styles.tableCell, styles.accessColumn]}>
-                        <Text style={styles.lastLogin}>{user.lastLogin}</Text>
-                        <Text style={styles.joinDate}>Iscritto: {user.joinDate}</Text>
+                        <Text style={styles.lastLogin}>{user.last_login ? formatDateTimeIT(user.last_login) : '-'}</Text>
+                        <Text style={styles.joinDate}>Iscritto: {formatDateIT(user.created_at)}</Text>
                       </View>
                       
                       <View style={[styles.tableCell, styles.sessionsColumn]}>
@@ -290,19 +288,21 @@ export default function AdminUsersPage() {
                             <View 
                               style={[
                                 styles.progressBar, 
-                                { width: `${getProgressPercentage(user.sessionsUsed, user.totalSessions)}%` }
+                                { width: `${getProgressPercentage(0, 0)}%` }
                               ]} 
                             />
                           </View>
                           <Text style={styles.progressText}>
-                            {user.sessionsUsed}/{user.totalSessions}
+                            0/0
                           </Text>
                         </View>
                       </View>
                       
                       <View style={[styles.tableCell, styles.statusColumn]}>
                         <Badge variant={user.status === 'active' ? 'success' : 'secondary'}>
-                          <Text style={styles.badgeText}>{user.status === 'active' ? 'Attivo' : 'Inattivo'}</Text>
+                          <Text style={styles.badgeText}>
+                            {user.status === 'active' ? 'Attivo' : user.status === 'inactive' ? 'Inattivo' : 'Sospeso'}
+                          </Text>
                         </Badge>
                       </View>
                       
@@ -335,13 +335,23 @@ export default function AdminUsersPage() {
             {filteredUsers.length > 0 && (
               <View style={styles.pagination}>
                 <Text style={styles.paginationText}>
-                  Mostrando {filteredUsers.length} di {users.length} utenti
+                  Mostrando {filteredUsers.length} di {pagination?.total ?? filteredUsers.length} utenti
                 </Text>
                 <View style={styles.paginationButtons}>
-                  <Button variant="outline" size="sm" onPress={() => {}} disabled>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onPress={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={!pagination || page <= 1}
+                  >
                     <Text style={styles.paginationButtonText}>Precedente</Text>
                   </Button>
-                  <Button variant="outline" size="sm" onPress={() => {}} disabled>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onPress={() => setPage((p) => (!pagination ? p : Math.min(pagination.last_page, p + 1)))}
+                    disabled={!pagination || page >= (pagination?.last_page ?? 1)}
+                  >
                     <Text style={styles.paginationButtonText}>Successivo</Text>
                   </Button>
                 </View>

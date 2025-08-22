@@ -5,7 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Breadcrumb } from '../../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../../src/components/breadcrumb';
 import { Button } from '../../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../src/components/card';
 import { Input } from '../../../../src/components/input';
@@ -79,12 +79,13 @@ export default function PaymentPage() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Breadcrumb
+        {/* Breadcrumb - Removed for mobile app */}
+        {/* <Breadcrumb
           items={[
             { label: 'Sessioni', onPress: handleBackToSessions },
             { label: 'Pagamento Sicuro' },
           ]}
-        />
+        /> */}
         <View style={styles.securityIcon}>
           <Ionicons name="shield-checkmark" size={20} color="#10b981" />
         </View>

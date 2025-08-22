@@ -2,107 +2,121 @@
 // User sessions page with tabs for upcoming, completed sessions and package purchase
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AppIcon } from '../../../src/components/app-icon';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../src/components/card';
+import { Card, CardContent } from '../../../src/components/card';
 import { useScreenSize } from '../../../src/hooks/use-screen-size';
+import { api } from '../../../src/utils/api';
+import { getUser } from '../../../src/utils/auth';
+import { formatDateIT, parseToDate } from '../../../src/utils/date';
 
 export default function SessionsPage() {
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [userStats, setUserStats] = useState({
+    totalSessions: 0,
+    completedSessions: 0,
+    remainingSessions: 0,
+    nextSession: '',
+  });
+  const [upcomingSessions, setUpcomingSessions] = useState<any[]>([]);
+  const [completedSessions, setCompletedSessions] = useState<any[]>([]);
 
-  const userStats = {
-    totalSessions: 12,
-    completedSessions: 4,
-    remainingSessions: 8,
-    nextSession: '15 Gen 2024, 14:30',
-  };
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const user = await getUser();
+        if (!user?.email) {
+          setError('Utente non autenticato. Effettua di nuovo il login.');
+          setLoading(false);
+          return;
+        }
 
-  const upcomingSessions = [
-    {
-      id: 1,
-      date: '15 Gen 2024',
-      time: '14:30',
-      psychologist: 'Dr.ssa Maria Bianchi',
-      type: 'Online',
-      status: 'confirmed',
-    },
-    {
-      id: 2,
-      date: '22 Gen 2024',
-      time: '14:30',
-      psychologist: 'Dr.ssa Maria Bianchi',
-      type: 'Online',
-      status: 'confirmed',
-    },
-  ];
+        // Trova il profilo paziente dell'utente corrente via ricerca per email
+        const patientsRes = await api.get<any>(`/patients?per_page=1&search=${encodeURIComponent(user.email)}`);
+        if (!patientsRes.ok || !Array.isArray(patientsRes.data)) {
+          setError(patientsRes.message || 'Impossibile recuperare il profilo paziente');
+          setLoading(false);
+          return;
+        }
+        const patient = patientsRes.data[0];
+        if (!patient?.id) {
+          setError('Nessun profilo paziente associato al tuo account.');
+          setLoading(false);
+          return;
+        }
 
-  const completedSessions = [
-    {
-      id: 1,
-      date: '12 Gen 2024',
-      time: '14:30',
-      psychologist: 'Dr.ssa Maria Bianchi',
-      type: 'Online',
-      duration: '50 min',
-      notes: 'Sessione molto produttiva, progressi nella gestione dello stress',
-    },
-    {
-      id: 2,
-      date: '8 Gen 2024',
-      time: '14:30',
-      psychologist: 'Dr.ssa Maria Bianchi',
-      type: 'Online',
-      duration: '50 min',
-      notes: 'Lavoro su tecniche di respirazione e mindfulness',
-    },
-    {
-      id: 3,
-      date: '3 Gen 2024',
-      time: '14:30',
-      psychologist: 'Dr.ssa Maria Bianchi',
-      type: 'Online',
-      duration: '50 min',
-      notes: 'Prima sessione, valutazione iniziale completata',
-    },
-  ];
+        const patientId = patient.id as number;
 
-  const sessionPackages = [
-    {
-      id: 1,
-      name: 'Pacchetto Base',
-      sessions: 5,
-      price: 250,
-      description: 'Ideale per un supporto continuativo',
-      popular: false,
-    },
-    {
-      id: 2,
-      name: 'Pacchetto Standard',
-      sessions: 10,
-      price: 450,
-      description: 'Il più scelto dai nostri utenti',
-      popular: true,
-    },
-    {
-      id: 3,
-      name: 'Pacchetto Premium',
-      sessions: 20,
-      price: 800,
-      description: 'Per un percorso completo e approfondito',
-      popular: false,
-    },
-  ];
+        // Carica prossime sessioni
+        const [upcomingRes, completedRes] = await Promise.all([
+          api.get<any>(`/sessions?per_page=50&patient_id=${patientId}&upcoming=1`),
+          api.get<any>(`/sessions?per_page=50&patient_id=${patientId}&status=completed`),
+        ]);
+
+        const toUiUpcoming = (Array.isArray(upcomingRes.data) ? upcomingRes.data : []).map((s: any) => {
+          const dt = parseToDate(s.session_date);
+          const pad = (v: number) => (v < 10 ? `0${v}` : String(v));
+          const time = dt ? `${pad(dt.getHours())}:${pad(dt.getMinutes())}` : '';
+          return {
+            id: s.id,
+            date: formatDateIT(s.session_date),
+            time,
+            psychologist: s.psychologist?.full_name || '—',
+            type: s.session_type || '—',
+            status: s.status || 'scheduled',
+          };
+        });
+
+        const toUiCompleted = (Array.isArray(completedRes.data) ? completedRes.data : []).map((s: any) => {
+          const dt = parseToDate(s.session_date);
+          const pad = (v: number) => (v < 10 ? `0${v}` : String(v));
+          const time = dt ? `${pad(dt.getHours())}:${pad(dt.getMinutes())}` : '';
+          return {
+            id: s.id,
+            date: formatDateIT(s.session_date),
+            time,
+            psychologist: s.psychologist?.full_name || '—',
+            type: s.session_type || '—',
+            duration: s.duration ? `${s.duration} min` : '',
+            notes: s.notes || '',
+          };
+        });
+
+        setUpcomingSessions(toUiUpcoming);
+        setCompletedSessions(toUiCompleted);
+
+        const totalSessions = Number(patient.total_sessions || 0);
+        const completedCount = Number(patient.completed_sessions || toUiCompleted.length || 0);
+        const remaining = Math.max(totalSessions - completedCount, 0);
+        const nextLabel = toUiUpcoming.length > 0 ? `${toUiUpcoming[0].date}, ${toUiUpcoming[0].time}` : '';
+
+        setUserStats({
+          totalSessions,
+          completedSessions: completedCount,
+          remainingSessions: remaining,
+          nextSession: nextLabel,
+        });
+      } catch (e: any) {
+        setError(e?.message || 'Errore imprevisto');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const handleBookSession = () => {
     router.push('/user/booking' as any);
   };
 
-  const handlePurchasePackage = (packageId: number) => {
-    router.push(`/user/payment/${packageId}` as any);
-  };
+  // Placeholder to keep previous API intact if needed in future
+  // Removed usage; function intentionally omitted.
 
   const handleBackToDashboard = () => {
     router.push('/user/dashboard' as any);
@@ -156,56 +170,20 @@ export default function SessionsPage() {
     </Card>
   );
 
-  const renderPackage = ({ item }: { item: typeof sessionPackages[0] }) => {
-    const cardStyle = item.popular 
-      ? { ...styles.packageCard, ...styles.popularPackage }
-      : styles.packageCard;
-    
-    const buttonStyle = item.popular 
-      ? { ...styles.purchaseButton, ...styles.popularButton }
-      : styles.purchaseButton;
-
-    return (
-      <Card style={cardStyle}>
-        {item.popular && (
-          <View style={styles.popularBadge}>
-            <Text style={styles.popularText}>PIÙ POPOLARE</Text>
-          </View>
-        )}
-        <CardHeader>
-          <CardTitle style={styles.packageTitle}>{item.name}</CardTitle>
-          <CardDescription>{item.description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <View style={styles.packagePricing}>
-            <Text style={styles.packagePrice}>€{item.price}</Text>
-            <Text style={styles.packageSessions}>{item.sessions} sessioni</Text>
-          </View>
-          <Text style={styles.pricePerSession}>
-            €{Math.round(item.price / item.sessions)} per sessione
-          </Text>
-          <Button
-            onPress={() => handlePurchasePackage(item.id)}
-            style={buttonStyle}
-          >
-            Acquista Ora
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  };
+  // Placeholder renderer removed since there are no packages for now
 
   const { isSmallScreen } = useScreenSize();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
-        <Breadcrumb
+        {/* Breadcrumb - Removed for mobile app */}
+        {/* <Breadcrumb
           items={[
             { label: 'Home', onPress: handleBackToDashboard },
             { label: 'Le Mie Sessioni' },
           ]}
-        />
+        /> */}
         {/* Qui puoi aggiungere un bottone a destra se necessario, come in /user/profile */}
       </View>
 
@@ -224,6 +202,25 @@ export default function SessionsPage() {
           <Text style={styles.statLabel}>Rimanenti</Text>
         </View>
       </View>
+
+      {loading && (
+        <View style={styles.tabContent}>
+          <View style={styles.emptyState}>
+            <AppIcon name="calendar" size={48} style={{ tintColor: '#9ca3af' }} />
+            <Text style={styles.emptyStateTitle}>Caricamento sessioni...</Text>
+          </View>
+        </View>
+      )}
+
+      {!!error && !loading && (
+        <View style={styles.tabContent}>
+          <View style={styles.emptyState}>
+            <AppIcon name="calendar" size={48} style={{ tintColor: '#ef4444' }} />
+            <Text style={styles.emptyStateTitle}>Errore</Text>
+            <Text style={styles.emptyStateText}>{error}</Text>
+          </View>
+        </View>
+      )}
 
       {/* Tab Navigation */}
       <View style={styles.tabContainer}>
@@ -254,7 +251,7 @@ export default function SessionsPage() {
       </View>
 
       {/* Tab Content */}
-      {activeTab === 'upcoming' && (
+      {activeTab === 'upcoming' && !loading && !error && (
         <View style={styles.tabContent}>
           {upcomingSessions.length > 0 ? (
             <FlatList
@@ -278,7 +275,7 @@ export default function SessionsPage() {
         </View>
       )}
 
-      {activeTab === 'completed' && (
+      {activeTab === 'completed' && !loading && !error && (
         <View style={styles.tabContent}>
           <FlatList
             data={completedSessions}
@@ -289,13 +286,13 @@ export default function SessionsPage() {
         </View>
       )}
 
-      {activeTab === 'packages' && (
+      {activeTab === 'packages' && !loading && !error && (
         <View style={[styles.tabContent, !isSmallScreen && { flexDirection: 'row', gap: 16 }]}> 
-          {sessionPackages.map((pkg) => (
-            <View key={pkg.id} style={!isSmallScreen ? { flex: 1 } : undefined}>
-              {renderPackage({ item: pkg })}
-            </View>
-          ))}
+          <View style={styles.emptyState}>
+            <AppIcon name="calendar" size={48} style={{ tintColor: '#9ca3af' }} />
+            <Text style={styles.emptyStateTitle}>Nessun pacchetto disponibile</Text>
+            <Text style={styles.emptyStateText}>Al momento non ci sono pacchetti acquistabili.</Text>
+          </View>
         </View>
       )}
     </ScrollView>
@@ -532,29 +529,7 @@ const styles = StyleSheet.create({
   bookButton: {
     backgroundColor: '#3b82f6',
   },
-  breadcrumbContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-    gap: 8,
-  },
-  breadcrumbLink: {
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-  },
-  breadcrumbText: {
-    fontSize: 14,
-    color: '#3b82f6',
-  },
-  breadcrumbSeparator: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginHorizontal: 4,
-  },
-  breadcrumbCurrent: {
-    color: '#111827',
-    fontWeight: 'bold',
-  },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',

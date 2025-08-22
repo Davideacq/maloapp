@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 
 export default function PsychologistCalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -173,11 +174,21 @@ export default function PsychologistCalendarPage() {
             resizeMode="contain"
           />
         </View>
+        <View style={styles.headerCenter}>
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
+            items={[
+              { label: 'Dashboard', onPress: handleBackToDashboard },
+              { label: 'Calendario' },
+            ]}
+          /> */}
+        </View>
         <View style={styles.headerRight}>
-          <Button onPress={handleBackToDashboard} variant="outline" size="sm">
-            <Ionicons name="arrow-back" size={16} color="#666" style={styles.buttonIcon} />
-            <Text style={styles.backButtonText}>Dashboard</Text>
-          </Button>
+          <Pressable onPress={() => {}} style={styles.calendarButton}>
+            <Ionicons name="add" size={20} color="#1e40af" />
+            <Text style={styles.calendarButtonText}>Nuovo</Text>
+          </Pressable>
+
         </View>
       </View>
 
@@ -389,6 +400,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   logo: {
     width: 120,
     height: 32,
@@ -397,6 +414,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
+  },
+  calendarButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+    position: 'relative',
+  },
+  calendarButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e40af',
+    marginLeft: 8,
   },
   headerTitle: {
     fontSize: 20,

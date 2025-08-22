@@ -4,19 +4,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Slot, router } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
-    Alert,
-    Dimensions,
-    Image,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableWithoutFeedback,
-    View
+  Alert,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Avatar } from '../../src/components/avatar';
+import { WebAppHeader } from '../../src/components/web-app-header';
 import { Notification, NotificationMenu } from '../../src/components/notification-menu';
+import { useScreenSize } from '../../src/hooks/use-screen-size';
 import { logoutUser } from '../../src/utils/auth';
 
 // Context per avatar globale
@@ -30,6 +28,7 @@ export function useUserAvatar() {
 }
 
 export default function UserLayout() {
+  const { isSmallScreen, isMediumScreen } = useScreenSize();
   const [user] = useState({
     name: 'Mario Rossi',
     company: 'Azienda SpA',
@@ -49,9 +48,7 @@ export default function UserLayout() {
     AsyncStorage.setItem('userAvatar', src);
   };
 
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
   const [useBottomNavigation, setUseBottomNavigation] = useState(false);
 
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -99,22 +96,8 @@ export default function UserLayout() {
 
   // Calculate if we should use bottom navigation based on screen width
   useEffect(() => {
-    const updateLayout = () => {
-      const width = Dimensions.get('window').width;
-      setWindowWidth(width);
-      
-      // Use bottom navigation if:
-      // 1. Not web platform, OR
-      // 2. Web platform but screen width is too small for desktop navigation
-      // Estimated minimum width needed for desktop navigation: ~800px
-      const shouldUseBottomNav = Platform.OS !== 'web' || width < 800;
-      setUseBottomNavigation(shouldUseBottomNav);
-    };
-
-    updateLayout();
-    
-    const subscription = Dimensions.addEventListener('change', updateLayout);
-    return () => subscription?.remove();
+    // Use bottom navigation only on native apps. On web, always show header.
+    setUseBottomNavigation(Platform.OS !== 'web');
   }, []);
 
   const handleNavigation = (path: string) => {
@@ -158,105 +141,29 @@ export default function UserLayout() {
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  const getUserInitial = () => {
-    return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
+  // const getUserInitial = () => {
+  //   return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  // };
 
-  const closeProfileMenu = () => {
-    setShowProfileMenu(false);
-  };
+  
 
   return (
     <UserAvatarContext.Provider value={{ avatar, setAvatar }}>
     <SafeAreaView style={styles.container}>
-      {/* Top Header - Only for Web with sufficient space */}
-      {Platform.OS === 'web' && !useBottomNavigation && (
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Pressable onPress={() => handleNavigation('/user/dashboard')}>
-              <Image 
-                source={require('../../assets/images/malo-logo-dark.png')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-            </Pressable>
-          </View>
-
-          <View style={styles.headerRight}>
-            {/* Booking Button - Only show on web */}
-            <Pressable 
-              style={styles.outlinedButton}
-              onPress={() => handleNavigation('/user/booking')}
-            >
-              <View style={styles.bookingContainer}>
-                <Ionicons name="add" size={16} color="#374151" />
-                <Text style={styles.bookingText}>Prenota</Text>
-              </View>
-            </Pressable>
-
-            {/* Notification Badge */}
-            <Pressable 
-              style={styles.notificationButton}
-              onPress={() => setShowNotifications(true)}
-            >
-              <Ionicons name="notifications" size={20} color="#1e40af" />
-              {unreadCount > 0 && (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.notificationBadgeText}>
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-
-            {/* Profile Avatar with Dropdown - Only on web */}
-            <View style={styles.profileContainer}>
-              <Pressable
-                onPress={() => setShowProfileMenu(!showProfileMenu)}
-                style={styles.profileButton}
-              >
-                <View style={styles.profileInfo}>
-                  <View style={styles.profileAvatar}>
-                    <Avatar src={avatar} alt={user.name} size="md" />
-                  </View>
-                  <Text style={styles.userName}>{user.name}</Text>
-                </View>
-              </Pressable>
-              
-              {/* Profile Dropdown Menu */}
-              {showProfileMenu && (
-                <TouchableWithoutFeedback onPress={closeProfileMenu}>
-                  <View style={styles.dropdownOverlay}>
-                    <TouchableWithoutFeedback onPress={() => {}}>
-                      <View style={styles.dropdownMenu}>
-                        <Pressable
-                          style={styles.dropdownItem}
-                          onPress={() => {
-                            closeProfileMenu();
-                            handleNavigation('/user/profile');
-                          }}
-                        >
-                          <Ionicons name="person" size={16} color="#374151" />
-                          <Text style={styles.dropdownText}>Il tuo profilo</Text>
-                        </Pressable>
-                        <Pressable
-                          style={styles.dropdownItem}
-                          onPress={() => {
-                            closeProfileMenu();
-                            handleLogout();
-                          }}
-                        >
-                          <Ionicons name="log-out" size={16} color="#ef4444" />
-                          <Text style={[styles.dropdownText, styles.logoutText]}>Logout</Text>
-                        </Pressable>
-                      </View>
-                    </TouchableWithoutFeedback>
-                  </View>
-                </TouchableWithoutFeedback>
-              )}
-            </View>
-          </View>
-        </View>
+      {/* Top Header - Hidden on mobile (bottom navigation) */}
+      {!useBottomNavigation && (
+        <WebAppHeader
+          isSmallScreen={isSmallScreen}
+          isMediumScreen={isMediumScreen}
+          userName={user.name}
+          avatar={avatar}
+          unreadCount={unreadCount}
+          onLogoPress={() => handleNavigation('/user/dashboard')}
+          onPressBooking={() => handleNavigation('/user/booking')}
+          onPressNotifications={() => setShowNotifications(true)}
+          onPressProfile={() => handleNavigation('/user/profile')}
+          onLogout={handleLogout}
+        />
       )}
 
       {/* Main Content */}
@@ -333,20 +240,50 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 20,
     paddingBottom: 16,
+    minHeight: 80,
+
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
     zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  headerSmall: {
+    paddingTop: 16,
+    paddingBottom: 12,
+    paddingHorizontal: 16,
+    minHeight: 72,
+  },
+  headerMedium: {
+    paddingTop: 18,
+    paddingBottom: 14,
+    paddingHorizontal: 18,
+    minHeight: 88,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  logoContainer: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+
+  },
   logo: {
     width: 120,
     height: 32,
+
+  },
+  logoSmall: {
+    width: 100,
+    height: 26,
   },
   headerRight: {
     flexDirection: 'row',
@@ -356,22 +293,30 @@ const styles = StyleSheet.create({
   outlinedButton: {
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    borderRadius: 6,
+    borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: 'white',
+    backgroundColor: '#f9fafb',
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  outlinedButtonSmall: {
+    paddingHorizontal: 8,
+    height: 36,
   },
   bookingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   bookingText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#374151',
   },
   profileContainer: {
@@ -380,6 +325,12 @@ const styles = StyleSheet.create({
   },
   profileButton: {
     cursor: 'pointer',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  profileButtonPressed: {
+    opacity: 0.7,
+    backgroundColor: '#f3f4f6',
   },
   profileInfo: {
     flexDirection: 'row',
@@ -387,8 +338,14 @@ const styles = StyleSheet.create({
     gap: 12,
     height: 40,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
     justifyContent: 'center',
+    borderRadius: 8,
+  },
+  profileInfoSmall: {
+    height: 36,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
   },
   userName: {
     fontSize: 14,
@@ -411,11 +368,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   dropdownOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
     zIndex: 999,
   },
   dropdownMenu: {
@@ -490,6 +444,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#dbeafe',
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  notificationButtonSmall: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+
   },
   notificationBadge: {
     position: 'absolute',
@@ -503,7 +467,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: 'white',
-  },
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+        },
   notificationBadgeText: {
     fontSize: 11,
     fontWeight: '700',

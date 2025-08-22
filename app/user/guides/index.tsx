@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { ImageCardOverlay } from '../../../src/components/image-card-overlay';
 import { Input } from '../../../src/components/input';
 import { useScreenSize } from '../../../src/hooks/use-screen-size';
@@ -16,81 +16,10 @@ export default function GuidesPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const categories = [
-    { id: 'all', label: 'Tutte', count: 24 },
-    { id: 'stress', label: 'Gestione Stress', count: 8 },
-    { id: 'mindfulness', label: 'Mindfulness', count: 6 },
-    { id: 'communication', label: 'Comunicazione', count: 5 },
-    { id: 'productivity', label: 'Produttività', count: 5 },
+    { id: 'all', label: 'Tutte', count: 0 },
   ];
 
-  const guides = [
-    {
-      id: 1,
-      title: 'Tecniche di Respirazione per Ridurre lo Stress',
-      description: 'Impara tecniche di respirazione efficaci per gestire momenti di stress acuto',
-      category: 'stress',
-      duration: '15 min',
-      difficulty: 'Principiante',
-      completed: true,
-      type: 'video',
-      personalizedFor: ['workload', 'deadlines'],
-    },
-    {
-      id: 2,
-      title: 'Mindfulness per la Concentrazione',
-      description: 'Esercizi di mindfulness per migliorare focus e concentrazione durante il lavoro',
-      category: 'mindfulness',
-      duration: '20 min',
-      difficulty: 'Intermedio',
-      completed: false,
-      type: 'audio',
-      personalizedFor: ['focus'],
-    },
-    {
-      id: 3,
-      title: 'Comunicazione Assertiva',
-      description: 'Come comunicare in modo efficace e assertivo con colleghi e superiori',
-      category: 'communication',
-      duration: '25 min',
-      difficulty: 'Intermedio',
-      completed: false,
-      type: 'article',
-      personalizedFor: ['relationships'],
-    },
-    {
-      id: 4,
-      title: 'Gestione del Tempo e Priorità',
-      description: 'Strategie pratiche per organizzare il lavoro e gestire le priorità',
-      category: 'productivity',
-      duration: '18 min',
-      difficulty: 'Principiante',
-      completed: true,
-      type: 'interactive',
-      personalizedFor: ['time-management'],
-    },
-    {
-      id: 5,
-      title: 'Meditazione Guidata per il Sonno',
-      description: 'Esercizi di rilassamento per migliorare la qualità del sonno',
-      category: 'mindfulness',
-      duration: '30 min',
-      difficulty: 'Principiante',
-      completed: false,
-      type: 'audio',
-      personalizedFor: ['sleep'],
-    },
-    {
-      id: 6,
-      title: 'Gestione dei Conflitti sul Lavoro',
-      description: 'Strategie per affrontare e risolvere conflitti in ambito lavorativo',
-      category: 'communication',
-      duration: '22 min',
-      difficulty: 'Avanzato',
-      completed: false,
-      type: 'video',
-      personalizedFor: ['relationships'],
-    },
-  ];
+  const guides: any[] = [];
 
   const filteredGuides = guides.filter((guide) => {
     const matchesSearch = guide.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -147,8 +76,8 @@ export default function GuidesPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Breadcrumb */}
-      <Breadcrumb items={[{ label: 'Dashboard', onPress: handleBackToDashboard }, { label: 'Guide Personalizzate' }]} />
+              {/* Breadcrumb - Removed for mobile app */}
+        {/* <Breadcrumb items={[{ label: 'Dashboard', onPress: handleBackToDashboard }, { label: 'Guide Personalizzate' }]} /> */}
 
       <ScrollView style={styles.content}>
         {/* Search Bar */}
@@ -207,7 +136,7 @@ export default function GuidesPage() {
             })}
           </View>
           {filteredGuides.length === 0 && (
-            <Text style={styles.emptyText}>Nessuna guida trovata</Text>
+            <Text style={styles.emptyText}>Nessuna guida disponibile</Text>
           )}
         </View>
       </ScrollView>

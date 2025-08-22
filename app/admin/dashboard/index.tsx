@@ -7,12 +7,15 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
+import { useScreenSize } from '../../../src/hooks/use-screen-size';
 
 export default function AdminDashboard() {
   console.log('AdminDashboard page loaded');
   
+  const { isSmallScreen, isMediumScreen } = useScreenSize();
   const [searchTerm, setSearchTerm] = useState('');
 
   const stats = {
@@ -80,27 +83,106 @@ export default function AdminDashboard() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Navigation */}
-      <View style={styles.header}>
+
+      <View style={[
+        styles.header,
+        isSmallScreen && styles.headerSmall,
+        isMediumScreen && styles.headerMedium
+      ]}>
         <View style={styles.headerLeft}>
-          <Image
-            source={require('../../../assets/images/malo-logo-dark.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <Pressable 
+            style={styles.logoContainer}
+            onPress={() => handleNavigation('/admin/dashboard')}
+          >
+            <Image
+              source={require('../../../assets/images/malo-logo-dark.png')}
+              style={[
+                styles.logo,
+                isSmallScreen && styles.logoSmall
+              ]}
+              resizeMode="contain"
+            />
+          </Pressable>
         </View>
-        <View style={styles.headerRight}>
-          <Button onPress={() => handleNavigation('/admin/companies/create')} variant="default" size="sm">
-            <Ionicons name="add" size={16} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Aggiungi Azienda</Text>
-          </Button>
-          <Button onPress={() => handleNavigation('/admin/settings')} variant="outline" size="sm">
-            <Ionicons name="settings" size={16} color="#666" style={styles.buttonIcon} />
-            <Text style={styles.outlineButtonText}>Impostazioni</Text>
-          </Button>
+        <View style={[
+          styles.headerCenter,
+          isSmallScreen && styles.headerCenterSmall
+        ]}>
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
+            items={[
+              { label: 'Dashboard' },
+            ]}
+            variant="compact"
+          /> */}
+        </View>
+        <View style={[
+          styles.headerRight,
+          isSmallScreen && styles.headerRightSmall
+        ]}>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/companies/create')} 
+            style={({ pressed }) => [
+              styles.headerButton,
+              isSmallScreen && styles.headerButtonSmall,
+              pressed && styles.buttonPressed
+            ]}
+          >
+            <Ionicons name="add-circle" size={isSmallScreen ? 16 : 20} color="white" />
+            {!isSmallScreen && (
+              <Text style={styles.headerButtonText}>Nuova Azienda</Text>
+            )}
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/settings')} 
+            style={({ pressed }) => [
+              styles.headerButtonOutline,
+              isSmallScreen && styles.headerButtonOutlineSmall,
+              pressed && styles.buttonPressed
+            ]}
+          >
+            <Ionicons name="settings-outline" size={isSmallScreen ? 16 : 20} color="#374151" />
+            {!isSmallScreen && (
+              <Text style={styles.headerButtonTextOutline}>Impostazioni</Text>
+            )}
+          </Pressable>
+
         </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Quick Navigation */}
+        <View style={styles.quickNav}>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/companies')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="business" size={24} color="#3b82f6" />
+            <Text style={styles.quickNavText}>Aziende</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/analytics')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="analytics" size={24} color="#14b8a6" />
+            <Text style={styles.quickNavText}>Analytics</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/content')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="library" size={24} color="#f97316" />
+            <Text style={styles.quickNavText}>Contenuti</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => handleNavigation('/admin/settings')} 
+            style={styles.quickNavButton}
+          >
+            <Ionicons name="settings" size={24} color="#8b5cf6" />
+            <Text style={styles.quickNavText}>Impostazioni</Text>
+          </Pressable>
+        </View>
+
         {/* Dashboard Title */}
         <View style={styles.titleSection}>
           <Text style={styles.mainTitle}>Dashboard Amministratore</Text>
@@ -356,25 +438,117 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
+
+    paddingHorizontal: 16,
+    paddingTop: 20,
     paddingBottom: 16,
+    minHeight: 80,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
+  headerSmall: {
+    minHeight: 72,
+    paddingHorizontal: 12,
+    paddingTop: 16,
+  },
+  headerMedium: {
+    minHeight: 88,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+  },
+
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  logoContainer: {
+    padding: 4,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
   },
   logo: {
     width: 120,
     height: 32,
   },
+  logoSmall: {
+    width: 100,
+    height: 26,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerCenterSmall: {
+    flex: 0.8,
+
+  },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
+  },
+  headerRightSmall: {
+    gap: 8,
+
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#3b82f6',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  headerButtonSmall: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  headerButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  headerButtonOutline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  headerButtonOutlineSmall: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  headerButtonTextOutline: {
+    color: '#374151',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   buttonIcon: {
     marginRight: 4,
@@ -393,7 +567,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    paddingTop: 16,
     padding: 16,
+  },
+  quickNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
+  quickNavButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    backgroundColor: '#f9fafb',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    minWidth: 80,
+  },
+  quickNavText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#374151',
+    marginTop: 4,
+    textAlign: 'center',
   },
   titleSection: {
     marginBottom: 32,
