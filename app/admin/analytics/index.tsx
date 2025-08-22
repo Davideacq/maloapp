@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '../../../src/components/badge';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 
 export default function AdminAnalyticsPage() {
@@ -79,14 +79,14 @@ export default function AdminAnalyticsPage() {
             resizeMode="contain"
           />
         </View>
-        <View style={styles.headerCenter}>
+        {/* <View style={styles.headerCenter}>
           <Breadcrumb
             items={[
               { label: 'Dashboard', onPress: () => handleNavigation('/admin/dashboard') },
               { label: 'Analytics' },
             ]}
           />
-        </View>
+        </View> */}
         <View style={styles.headerRight}>
           <View style={styles.timeRangeContainer}>
             <Text style={styles.timeRangeLabel}>Ultimi 30 giorni</Text>

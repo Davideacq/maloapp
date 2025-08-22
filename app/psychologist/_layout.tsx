@@ -1,24 +1,39 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Slot, router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { WebAppHeader } from '../../src/components/web-app-header';
+import { useScreenSize } from '../../src/hooks/use-screen-size';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { api } from '../../src/utils/api';
 
 export default function PsychologistLayout() {
-  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
+  const { isSmallScreen, isMediumScreen } = useScreenSize();
   const [useBottomNavigation, setUseBottomNavigation] = useState(false);
+  const [headerName, setHeaderName] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [unreadCount] = useState(0);
 
   useEffect(() => {
-    const updateLayout = () => {
-      const width = Dimensions.get('window').width;
-      setWindowWidth(width);
-      const shouldUseBottomNav = Platform.OS !== 'web' || width < 800;
-      setUseBottomNavigation(shouldUseBottomNav);
-    };
+    // Use bottom navigation only on native apps. On web, always show header.
+    setUseBottomNavigation(Platform.OS !== 'web');
+  }, []);
 
-    updateLayout();
-    const subscription = Dimensions.addEventListener('change', updateLayout);
-    return () => subscription?.remove();
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      const res = await api.get('/psychologists/me');
+      if (res.ok && res.data && isMounted) {
+        const d: any = res.data;
+        const fullName = d?.user?.full_name
+          || `${d?.user?.first_name ?? ''} ${d?.user?.last_name ?? ''}`.trim();
+        setHeaderName(fullName || d?.user?.email || '');
+        setAvatar(d?.avatar_url ?? '');
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleNavigation = (path: string) => {
@@ -27,6 +42,22 @@ export default function PsychologistLayout() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Top Header - Web only (hidden on native where bottom navigation is used) */}
+      {!useBottomNavigation && (
+        <WebAppHeader
+          isSmallScreen={isSmallScreen}
+          isMediumScreen={isMediumScreen}
+          userName={headerName}
+          avatar={avatar}
+          unreadCount={unreadCount}
+          onLogoPress={() => handleNavigation('/psychologist/dashboard')}
+          onPressBooking={() => handleNavigation('/psychologist/calendar')}
+          onPressNotifications={() => handleNavigation('/psychologist/dashboard')}
+          onPressProfile={() => handleNavigation('/psychologist/profile')}
+          onLogout={() => handleNavigation('/login')}
+        />
+      )}
+
       <View style={styles.content}>
         <Slot />
       </View>

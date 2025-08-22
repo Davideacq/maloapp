@@ -8,7 +8,7 @@ import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '../../../src/components/avatar';
 import { Badge } from '../../../src/components/badge';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../src/components/card';
 import { Dialog } from '../../../src/components/dialog';
@@ -132,12 +132,13 @@ export default function ProfilePage() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Breadcrumb
+        {/* Breadcrumb - Removed for mobile app */}
+        {/* <Breadcrumb
           items={[
             { label: 'Home', onPress: handleBackToDashboard },
             { label: 'Profilo' },
           ]}
-        />
+        /> */}
         {/* Logout button */}
         <Button variant="destructive" onPress={handleLogout} style={[styles.logoutButton, isWebMobile && { paddingVertical: 4 }]}>
           Logout

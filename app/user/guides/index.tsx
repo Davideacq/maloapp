@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { ImageCardOverlay } from '../../../src/components/image-card-overlay';
 import { Input } from '../../../src/components/input';
 import { useScreenSize } from '../../../src/hooks/use-screen-size';
@@ -76,8 +76,8 @@ export default function GuidesPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Breadcrumb */}
-      <Breadcrumb items={[{ label: 'Dashboard', onPress: handleBackToDashboard }, { label: 'Guide Personalizzate' }]} />
+              {/* Breadcrumb - Removed for mobile app */}
+        {/* <Breadcrumb items={[{ label: 'Dashboard', onPress: handleBackToDashboard }, { label: 'Guide Personalizzate' }]} /> */}
 
       <ScrollView style={styles.content}>
         {/* Search Bar */}

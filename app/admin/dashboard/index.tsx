@@ -7,7 +7,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppIcon } from '../../../src/components/app-icon';
 import { Badge } from '../../../src/components/badge';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Button } from '../../../src/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../src/components/card';
 import { useScreenSize } from '../../../src/hooks/use-screen-size';
@@ -108,12 +108,13 @@ export default function AdminDashboard() {
           styles.headerCenter,
           isSmallScreen && styles.headerCenterSmall
         ]}>
-          <Breadcrumb
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
             items={[
               { label: 'Dashboard' },
             ]}
             variant="compact"
-          />
+          /> */}
         </View>
         <View style={[
           styles.headerRight,

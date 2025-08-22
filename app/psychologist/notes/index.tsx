@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Breadcrumb } from '../../../src/components/breadcrumb';
+// import { Breadcrumb } from '../../../src/components/breadcrumb';
 import { Card, CardContent } from '../../../src/components/card';
 
 export default function PsychologistNotesPage() {
@@ -36,12 +36,13 @@ export default function PsychologistNotesPage() {
           />
         </View>
         <View style={styles.headerCenter}>
-          <Breadcrumb
+          {/* Breadcrumb - Removed for mobile app */}
+          {/* <Breadcrumb
             items={[
               { label: 'Dashboard', onPress: handleBackToDashboard },
               { label: 'Note Cliniche' },
             ]}
-          />
+          /> */}
         </View>
         <View style={styles.headerRight}>
           <Pressable onPress={() => {}} style={styles.calendarButton}>

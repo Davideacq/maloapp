@@ -5,17 +5,14 @@ import { Slot, router } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
   Alert,
-  Dimensions,
-  Image,
   Platform,
   Pressable,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Avatar } from '../../src/components/avatar';
+import { WebAppHeader } from '../../src/components/web-app-header';
 import { Notification, NotificationMenu } from '../../src/components/notification-menu';
 import { useScreenSize } from '../../src/hooks/use-screen-size';
 import { logoutUser } from '../../src/utils/auth';
@@ -51,9 +48,7 @@ export default function UserLayout() {
     AsyncStorage.setItem('userAvatar', src);
   };
 
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
   const [useBottomNavigation, setUseBottomNavigation] = useState(false);
 
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -101,22 +96,8 @@ export default function UserLayout() {
 
   // Calculate if we should use bottom navigation based on screen width
   useEffect(() => {
-    const updateLayout = () => {
-      const width = Dimensions.get('window').width;
-      setWindowWidth(width);
-      
-      // Use bottom navigation if:
-      // 1. Not web platform, OR
-      // 2. Web platform but screen width is too small for desktop navigation
-      // Estimated minimum width needed for desktop navigation: ~800px
-      const shouldUseBottomNav = Platform.OS !== 'web' || width < 800;
-      setUseBottomNavigation(shouldUseBottomNav);
-    };
-
-    updateLayout();
-    
-    const subscription = Dimensions.addEventListener('change', updateLayout);
-    return () => subscription?.remove();
+    // Use bottom navigation only on native apps. On web, always show header.
+    setUseBottomNavigation(Platform.OS !== 'web');
   }, []);
 
   const handleNavigation = (path: string) => {
@@ -160,132 +141,29 @@ export default function UserLayout() {
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  const getUserInitial = () => {
-    return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
+  // const getUserInitial = () => {
+  //   return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  // };
 
-  const closeProfileMenu = () => {
-    setShowProfileMenu(false);
-  };
+  
 
   return (
     <UserAvatarContext.Provider value={{ avatar, setAvatar }}>
     <SafeAreaView style={styles.container}>
       {/* Top Header - Hidden on mobile (bottom navigation) */}
       {!useBottomNavigation && (
-      <View style={[
-        styles.header,
-        isSmallScreen && styles.headerSmall,
-        isMediumScreen && styles.headerMedium
-      ]}>
-        <View style={styles.headerLeft}>
-          {/* Logo - Always visible */}
-          <Pressable 
-            style={styles.logoContainer}
-            onPress={() => handleNavigation('/user/dashboard')}
-          >
-            <Image 
-              source={require('../../assets/images/malo-logo-dark.png')}
-              style={[
-                styles.logo,
-                isSmallScreen && styles.logoSmall
-              ]}
-              resizeMode="contain"
-            />
-          </Pressable>
-        </View>
-
-        <View style={styles.headerRight}>
-          {/* Booking Button - Hide text on small screens */}
-          <Pressable 
-            style={[
-              styles.outlinedButton,
-              isSmallScreen && styles.outlinedButtonSmall
-            ]}
-            onPress={() => handleNavigation('/user/booking')}
-          >
-            <View style={styles.bookingContainer}>
-              <Ionicons name="add" size={isSmallScreen ? 16 : 16} color="#374151" />
-              {!isSmallScreen && (
-                <Text style={styles.bookingText}>Prenota</Text>
-              )}
-            </View>
-          </Pressable>
-
-          {/* Notification Badge */}
-          <Pressable 
-            style={[
-              styles.notificationButton,
-              isSmallScreen && styles.notificationButtonSmall
-            ]}
-            onPress={() => setShowNotifications(true)}
-          >
-            <Ionicons name="notifications" size={isSmallScreen ? 18 : 20} color="#1e40af" />
-            {unreadCount > 0 && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationBadgeText}>
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </Text>
-              </View>
-            )}
-          </Pressable>
-
-          {/* Profile Avatar with Dropdown */}
-          <View style={styles.profileContainer}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.profileButton,
-                pressed && styles.profileButtonPressed
-              ]}
-              onPress={() => setShowProfileMenu(!showProfileMenu)}
-            >
-              <View style={[
-                styles.profileInfo,
-                isSmallScreen && styles.profileInfoSmall
-              ]}>
-                <View style={styles.profileAvatar}>
-                  <Avatar src={avatar} alt={user.name} size={isSmallScreen ? "sm" : "md"} />
-                </View>
-                {!isSmallScreen && (
-                  <Text style={styles.userName}>{user.name}</Text>
-                )}
-              </View>
-            </Pressable>
-            
-            {/* Profile Dropdown Menu */}
-            {showProfileMenu && (
-              <TouchableWithoutFeedback onPress={closeProfileMenu}>
-                <View style={styles.dropdownOverlay}>
-                  <TouchableWithoutFeedback onPress={() => {}}>
-                    <View style={styles.dropdownMenu}>
-                      <Pressable
-                        style={styles.dropdownItem}
-                        onPress={() => {
-                          closeProfileMenu();
-                          handleNavigation('/user/profile');
-                        }}
-                      >
-                        <Ionicons name="person" size={16} color="#374151" />
-                        <Text style={styles.dropdownText}>Il tuo profilo</Text>
-                      </Pressable>
-                      <Pressable
-                        style={styles.dropdownItem}
-                        onPress={() => {
-                          closeProfileMenu();
-                          handleLogout();
-                        }}
-                      >
-                        <Ionicons name="log-out" size={16} color="#ef4444" />
-                        <Text style={[styles.dropdownText, styles.logoutText]}>Logout</Text>
-                      </Pressable>
-                    </View>
-                  </TouchableWithoutFeedback>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-          </View>
-        </View>
-      </View>
+        <WebAppHeader
+          isSmallScreen={isSmallScreen}
+          isMediumScreen={isMediumScreen}
+          userName={user.name}
+          avatar={avatar}
+          unreadCount={unreadCount}
+          onLogoPress={() => handleNavigation('/user/dashboard')}
+          onPressBooking={() => handleNavigation('/user/booking')}
+          onPressNotifications={() => setShowNotifications(true)}
+          onPressProfile={() => handleNavigation('/user/profile')}
+          onLogout={handleLogout}
+        />
       )}
 
       {/* Main Content */}
@@ -401,7 +279,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 120,
     height: 32,
-]
+
   },
   logoSmall: {
     width: 100,
