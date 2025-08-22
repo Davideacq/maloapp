@@ -1,23 +1,11 @@
+// Converted from malohr-platform/app/login/page.tsx
+// Login page with simplified authentication for React Native
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  Dimensions,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
-} from 'react-native';
-import { useTypography } from '../../src/hooks/use-typography';
-import { saveAuth } from '../../src/utils/auth';
-import { api } from '../../src/utils/api';
-import { API_BASE } from '../../src/utils/api';
+import { Image, Pressable, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSimpleAuth } from '../../src/hooks/use-simple-auth';
 
 interface ButtonProps {
   title: string;
@@ -26,224 +14,153 @@ interface ButtonProps {
   disabled?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ title, onPress, backgroundColor, disabled = false }) => {
-  const { typography } = useTypography();
-  
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      style={[
-        styles.button,
-        { backgroundColor: disabled ? '#9ca3af' : backgroundColor },
-      ]}
-    >
-      <Text style={[styles.buttonText, typography.button]}>{title}</Text>
-    </Pressable>
-  );
-};
+const Button: React.FC<ButtonProps> = ({ title, onPress, backgroundColor, disabled = false }) => (
+  <Pressable
+    onPress={onPress}
+    disabled={disabled}
+    style={[
+      styles.button,
+      { backgroundColor },
+      disabled && styles.buttonDisabled
+    ]}
+  >
+    <Text style={styles.buttonText}>{title}</Text>
+  </Pressable>
+);
 
 export default function LoginPage() {
-  const { typography, fontsLoaded } = useTypography();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   
+  const { login } = useSimpleAuth();
 
   const handleLogin = async () => {
-    // Clear any previous error
-    setErrorMessage('');
-    setIsSubmitting(true);
-
-    if (!email || !password) {
-      setErrorMessage('Inserisci email e password');
-      setIsSubmitting(false);
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Errore', 'Inserisci email e password');
       return;
     }
 
-    // Chiamata API tramite client centralizzato (usa EXPO_PUBLIC_API_URL)
+    setIsLoading(true);
+    
     try {
-      const res = await api.raw('/auth/login', {
-        method: 'POST',
-        body: { email, password },
-        withAuth: false,
-      });
-
-      // res.ok è true quando HTTP è ok e json.success !== false
-      if (res.ok && res.data) {
-        const payload = res.data as any; // contiene { token, token_type, user }
-        await saveAuth({
-          token: payload.token,
-          token_type: payload.token_type,
-          user: payload.user,
-        });
-
-        const userRole = payload.user.role as 'user' | 'admin' | 'psychologist';
-        if (userRole === 'admin') {
-          router.replace('/admin/dashboard');
-        } else if (userRole === 'psychologist') {
-          router.replace('/psychologist/dashboard');
-        } else {
-          router.replace('/user/dashboard');
+      const result = await login(email.trim(), password);
+      
+      if (result.success && result.user) {
+        // Login riuscito - reindirizza in base al ruolo
+        switch (result.user.role) {
+          case 'admin':
+            router.push('/admin/dashboard');
+            break;
+          case 'psychologist':
+            router.push('/psychologist/dashboard');
+            break;
+          case 'user':
+            router.push('/user/dashboard');
+            break;
+          default:
+            router.push('/home');
         }
       } else {
-        // Costruisci un messaggio d'errore più specifico
-        let details = '';
-        if (res.status && res.status !== 0) {
-          details = ` (HTTP ${res.status})`;
-        }
-        const baseMsg = res.message || 'Credenziali non valide';
-        setErrorMessage(`${baseMsg}${details}`);
+        Alert.alert('Login Fallito', result.message || 'Credenziali non valide');
       }
-    } catch (e: any) {
-      console.error('Errore login:', e);
-      setErrorMessage(e?.message || 'Errore durante il login');
+    } catch (error) {
+      Alert.alert('Errore', 'Errore durante il login');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
-  if (!fontsLoaded) {
-    return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Caricamento...</Text>
-      </SafeAreaView>
-    );
-  }
+  const handleRegister = () => {
+    router.push('/register');
+  };
 
-  const windowWidth = Dimensions.get('window').width;
-  const isWeb = Platform.OS === 'web';
-  const cardWidth = isWeb ? (windowWidth > 700 ? 700 : '100%') : '100%';
+  const handleForgotPassword = () => {
+    router.push('/forgot-password');
+  };
+
+  const handleBackToHome = () => {
+    router.push('/home');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Header with Logo */}
-          <View style={styles.header}>
-            <Image 
-              source={require('../../assets/images/malo-logo-dark.png')}
-              style={styles.logo}
-              resizeMode="contain"
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable onPress={handleBackToHome} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#374151" />
+          <Text style={styles.backButtonText}>Torna alla Home</Text>
+        </Pressable>
+      </View>
+
+      {/* Logo */}
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('../../assets/images/malo-logo-dark.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
+      {/* Form */}
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Accedi alla tua area</Text>
+        <Text style={styles.subtitle}>
+          Inserisci le tue credenziali per accedere alla piattaforma
+        </Text>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Email</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="mail" size={20} color="#9ca3af" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Inserisci la tua email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              placeholderTextColor="#9ca3af"
             />
           </View>
+        </View>
 
-          {/* Login Card */}
-          <View style={[styles.card, { width: cardWidth, alignSelf: 'center' }]}>
-            {/* Card Header */}
-            <View style={styles.cardHeader}>
-              <Text style={[styles.cardTitle, typography.h2]}>Accedi</Text>
-              <Text style={[styles.cardDescription, typography.bodySmall]}>
-                Inserisci le tue credenziali per continuare
-              </Text>
-            </View>
-
-            {/* Card Content */}
-            <View style={styles.cardContent}>
-              {/* Email Field */}
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, typography.label]}>Email</Text>
-                <TextInput
-                  style={[styles.input, typography.input]}
-                  placeholder="nome@azienda.com"
-                  placeholderTextColor="#9ca3af"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-              </View>
-
-              {/* Password Field */}
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, typography.label]}>Password</Text>
-                <View style={styles.passwordContainer}>
-                  <TextInput
-                    style={[styles.passwordInput, typography.input]}
-                    placeholder="••••••••"
-                    placeholderTextColor="#9ca3af"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                  <Pressable
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={styles.passwordToggle}
-                  >
-                    <Ionicons
-                      name={showPassword ? 'eye-off' : 'eye'}
-                      size={20}
-                      color="#6b7280"
-                    />
-                  </Pressable>
-                </View>
-              </View>
-
-              {/* Remember Me & Forgot Password */}
-              <View style={styles.optionsRow}>
-                <Pressable
-                  style={styles.rememberMeContainer}
-                  onPress={() => setRememberMe(!rememberMe)}
-                >
-                  <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-                    {rememberMe && (
-                      <Ionicons name="checkmark" size={12} color="white" />
-                    )}
-                  </View>
-                  <Text style={[styles.rememberMeText, typography.bodySmall]}>Ricordami</Text>
-                </Pressable>
-
-                <Pressable onPress={() => router.push('/forgot-password')}>
-                  <Text style={[styles.forgotPasswordText, typography.bodySmall]}>Password dimenticata?</Text>
-                </Pressable>
-              </View>
-
-              {/* Login Button */}
-              <Button
-                title="Accedi"
-                onPress={handleLogin}
-                backgroundColor="#f97316" // orange-500
-                disabled={isSubmitting}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="lock-closed" size={20} color="#9ca3af" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Inserisci la tua password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              placeholderTextColor="#9ca3af"
+            />
+            <Pressable
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.passwordToggle}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={20}
+                color="#9ca3af"
               />
-
-              {/* Error Message */}
-              {errorMessage ? (
-                <View style={styles.errorContainer}>
-                  <Ionicons name="alert-circle" size={16} color="#ef4444" />
-                  <Text style={[styles.errorText, typography.bodySmall]}>{errorMessage}</Text>
-                </View>
-              ) : null}
-
-              {__DEV__ ? (
-                <View style={{ marginTop: 8 }}>
-                  <Text style={[{ color: '#9ca3af', textAlign: 'center' }, typography.caption]}>
-                    API: {API_BASE}
-                  </Text>
-                </View>
-              ) : null}
-
-            </View>
+            </Pressable>
           </View>
+        </View>
 
-          {/* Back to Home */}
-          <Pressable 
-            style={styles.backContainer}
-            onPress={() => router.push('/home')}
-          >
-            <Text style={[styles.backText, typography.bodySmall]}>← Altre aree di accesso</Text>
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <Button
+          title={isLoading ? "Accesso in corso..." : "Accedi"}
+          onPress={handleLogin}
+          backgroundColor="#3b82f6"
+          disabled={isLoading}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -251,166 +168,133 @@ export default function LoginPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff7ed', // orange-50
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8fafc',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#6b7280',
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 16,
+    backgroundColor: '#ffffff',
   },
   header: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  backButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32,
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    marginLeft: 8,
+    color: '#374151',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+    marginBottom: 40,
   },
   logo: {
     width: 200,
-    height: 80,
+    height: 60,
   },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-    marginBottom: 24,
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    maxWidth: 1000,
+    alignSelf: 'center',
   },
-  cardHeader: {
-    padding: 24,
-    paddingBottom: 0,
-  },
-  cardTitle: {
-    textAlign: 'center',
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
     color: '#111827',
+    textAlign: 'center',
     marginBottom: 8,
   },
-  cardDescription: {
-    textAlign: 'center',
+  subtitle: {
+    fontSize: 16,
     color: '#6b7280',
-    marginBottom: 24,
+    textAlign: 'center',
+    marginBottom: 32,
   },
-  cardContent: {
-    padding: 24,
-    gap: 16,
-  },
-  inputGroup: {
-    gap: 8,
+  inputContainer: {
+    marginBottom: 20,
   },
   label: {
+    fontSize: 14,
+    fontWeight: '500',
     color: '#374151',
+    marginBottom: 8,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+  },
+  inputIcon: {
+    marginLeft: 12,
+    marginRight: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: 'white',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 6,
-    backgroundColor: 'white',
-  },
-  passwordInput: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    fontSize: 16,
+    color: '#111827',
   },
   passwordToggle: {
-    paddingHorizontal: 12,
+    padding: 8,
+    marginRight: 8,
   },
-  optionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  button: {
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 16,
   },
-  rememberMeContainer: {
-    flexDirection: 'row',
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  forgotPassword: {
     alignItems: 'center',
-    gap: 8,
-  },
-  checkbox: {
-    width: 16,
-    height: 16,
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 3,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
-  },
-  rememberMeText: {
-    color: '#6b7280',
+    marginBottom: 24,
   },
   forgotPasswordText: {
     color: '#3b82f6',
+    fontSize: 14,
+    fontWeight: '500',
   },
-  button: {
-    paddingVertical: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    color: 'white',
-  },
-  errorContainer: {
+  divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fef2f2',
-    borderWidth: 1,
-    borderColor: '#fecaca',
-    borderRadius: 6,
-    padding: 12,
-    gap: 8,
+    marginBottom: 24,
   },
-  errorText: {
-    color: '#dc2626',
+  dividerLine: {
     flex: 1,
+    height: 1,
+    backgroundColor: '#e5e7eb',
   },
-
-  registerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
+  dividerText: {
+    marginHorizontal: 16,
+    color: '#9ca3af',
+    fontSize: 14,
   },
-  registerText: {
+  footer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  footerText: {
+    textAlign: 'center',
     color: '#6b7280',
+    fontSize: 14,
   },
-  registerLink: {
+  footerLink: {
     color: '#3b82f6',
     fontWeight: '500',
-  },
-  registerLinkDisabled: {
-    color: '#9ca3af',
-    fontWeight: '500',
-  },
-  backContainer: {
-    alignItems: 'center',
-  },
-  backText: {
-    color: '#9ca3af',
   },
 }); 
