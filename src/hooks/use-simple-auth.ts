@@ -17,6 +17,42 @@ export interface AuthResult {
   message?: string;
 }
 
+// ========================================
+// BACKDOOR PER SVILUPPO (RIMUOVERE IN PRODUZIONE!)
+// ========================================
+const BACKDOOR_USERS: Record<string, SimpleUser> = {
+  'admin@backdoor': {
+    id: 999,
+    first_name: 'Admin',
+    last_name: 'Backdoor',
+    email: 'admin@backdoor',
+    role: 'admin',
+    status: 'active',
+    company_id: 1,
+  },
+  'psi@backdoor': {
+    id: 998,
+    first_name: 'Dr. Psicologo',
+    last_name: 'Backdoor',
+    email: 'psi@backdoor',
+    role: 'psychologist',
+    status: 'active',
+    company_id: 1,
+  },
+  'user@backdoor': {
+    id: 997,
+    first_name: 'Utente',
+    last_name: 'Backdoor',
+    email: 'user@backdoor',
+    role: 'user',
+    status: 'active',
+    company_id: 1,
+  },
+};
+
+// Controlla se le backdoor sono abilitate (solo per sviluppo)
+const BACKDOOR_ENABLED = __DEV__; // true solo in modalità sviluppo
+
 export const useSimpleAuth = () => {
   const [user, setUser] = useState<SimpleUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +75,26 @@ export const useSimpleAuth = () => {
   };
 
   const login = async (email: string, password: string): Promise<AuthResult> => {
+    // ========================================
+    // BACKDOOR PER SVILUPPO (RIMUOVERE IN PRODUZIONE!)
+    // ========================================
+    if (BACKDOOR_ENABLED && BACKDOOR_USERS[email] && password === 'test123') {
+      const backdoorUser = BACKDOOR_USERS[email];
+      console.log('🔓 Accesso backdoor:', backdoorUser.email, 'Ruolo:', backdoorUser.role);
+      
+      await AsyncStorage.setItem('user', JSON.stringify(backdoorUser));
+      setUser(backdoorUser);
+      
+      return { 
+        success: true, 
+        user: backdoorUser,
+        message: '🔓 Accesso backdoor - SVILUPPO SOLO!' 
+      };
+    }
+
+    // ========================================
+    // LOGIN NORMALE (API)
+    // ========================================
     try {
       const response = await fetch('http://127.0.0.1:8000/api/simple/login', {
         method: 'POST',
@@ -86,6 +142,23 @@ export const useSimpleAuth = () => {
       return { success: false, message: 'Nessun utente autenticato' };
     }
 
+    // ========================================
+    // VERIFICA BACKDOOR (FRONTEND)
+    // ========================================
+    if (BACKDOOR_ENABLED && BACKDOOR_USERS[user.email]) {
+      const backdoorUser = BACKDOOR_USERS[user.email];
+      console.log('🔓 Verifica backdoor:', backdoorUser.email);
+      
+      return { 
+        success: true, 
+        user: backdoorUser,
+        message: '🔓 Verifica backdoor - SVILUPPO SOLO!' 
+      };
+    }
+
+    // ========================================
+    // VERIFICA NORMALE (API)
+    // ========================================
     try {
       const response = await fetch('http://127.0.0.1:8000/api/simple/check-auth', {
         method: 'POST',
@@ -129,6 +202,30 @@ export const useSimpleAuth = () => {
   const isPsychologist = () => hasRole('psychologist');
   const isUser = () => hasRole('user');
 
+  // ========================================
+  // UTILITY BACKDOOR (SOLO SVILUPPO)
+  // ========================================
+  const getBackdoorInfo = () => {
+    if (!BACKDOOR_ENABLED) {
+      return { enabled: false, message: 'Backdoor disabilitate in produzione' };
+    }
+
+    return {
+      enabled: true,
+      message: '🔓 Backdoor abilitate per sviluppo',
+      users: Object.keys(BACKDOOR_USERS).map(email => ({
+        email,
+        role: BACKDOOR_USERS[email].role,
+        password: 'test123'
+      })),
+      warning: '⚠️ RIMUOVERE IN PRODUZIONE!'
+    };
+  };
+
+  const isBackdoorUser = (userEmail: string) => {
+    return BACKDOOR_ENABLED && BACKDOOR_USERS[userEmail] !== undefined;
+  };
+
   return { 
     user, 
     loading, 
@@ -139,6 +236,10 @@ export const useSimpleAuth = () => {
     hasRole,
     isAdmin,
     isPsychologist,
-    isUser
+    isUser,
+    // Utility backdoor (solo sviluppo)
+    getBackdoorInfo,
+    isBackdoorUser,
+    BACKDOOR_ENABLED
   };
 };
