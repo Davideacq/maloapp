@@ -3,9 +3,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSimpleAuth } from '../../src/hooks/use-simple-auth';
+import { useBackdoor } from '../../src/hooks/use-backdoor';
 
 interface ButtonProps {
   title: string;
@@ -31,10 +32,17 @@ const Button: React.FC<ButtonProps> = ({ title, onPress, backgroundColor, disabl
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   const { login } = useSimpleAuth();
+  const { showBackdoorCredentials, isEnabled: backdoorEnabled } = useBackdoor();
+
+  // Debug log per verificare l'hook
+  console.log('🔍 Debug useBackdoor:', { 
+    showBackdoorCredentials: typeof showBackdoorCredentials, 
+    backdoorEnabled,
+    isFunction: typeof showBackdoorCredentials === 'function'
+  });
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -45,25 +53,33 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const result = await login(email.trim(), password);
+      const result = await login(email.trim(), password.trim());
       
       if (result.success && result.user) {
-        // Login riuscito - reindirizza in base al ruolo
-        switch (result.user.role) {
-          case 'admin':
-            router.push('/admin/dashboard');
-            break;
-          case 'psychologist':
-            router.push('/psychologist/dashboard');
-            break;
-          case 'user':
-            router.push('/user/dashboard');
-            break;
-          default:
-            router.push('/home');
+        // Login riuscito - reindirizza direttamente
+        console.log('🔓 Login backdoor riuscito, redirect a:', result.user.role);
+        console.log('🔓 Dettagli utente:', result.user);
+        
+        // Reindirizza in base al ruolo
+        if (result.user) {
+          const targetRoute = (() => {
+            switch (result.user.role) {
+              case 'admin':
+                return '/admin/dashboard';
+              case 'psychologist':
+                return '/psychologist/dashboard';
+              case 'user':
+                return '/user/dashboard';
+              default:
+                return '/home';
+            }
+          })();
+          
+          console.log('🔓 Tentativo redirect a:', targetRoute);
+          router.push(targetRoute);
         }
       } else {
-        Alert.alert('Login Fallito', result.message || 'Credenziali non valide');
+        Alert.alert('Errore', result.message || 'Login fallito');
       }
     } catch (error) {
       Alert.alert('Errore', 'Errore durante il login');
@@ -81,7 +97,11 @@ export default function LoginPage() {
   };
 
   const handleBackToHome = () => {
-    router.push('/home');
+    router.push('/');
+  };
+
+  const handleShowBackdoorCredentials = () => {
+    showBackdoorCredentials();
   };
 
   return (
@@ -90,7 +110,7 @@ export default function LoginPage() {
       <View style={styles.header}>
         <Pressable onPress={handleBackToHome} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#374151" />
-          <Text style={styles.backButtonText}>Torna alla Home</Text>
+          <Text style={styles.backButtonText}>Indietro</Text>
         </Pressable>
       </View>
 
@@ -105,53 +125,33 @@ export default function LoginPage() {
 
       {/* Form */}
       <View style={styles.formContainer}>
-        <Text style={styles.title}>Accedi alla tua area</Text>
-        <Text style={styles.subtitle}>
-          Inserisci le tue credenziali per accedere alla piattaforma
-        </Text>
+        <Text style={styles.title}>Accedi</Text>
+        <Text style={styles.subtitle}>Inserisci le tue credenziali per accedere</Text>
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="mail" size={20} color="#9ca3af" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Inserisci la tua email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              placeholderTextColor="#9ca3af"
-            />
-          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Inserisci la tua email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
         </View>
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Password</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="lock-closed" size={20} color="#9ca3af" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Inserisci la tua password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-              placeholderTextColor="#9ca3af"
-            />
-            <Pressable
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.passwordToggle}
-            >
-              <Ionicons
-                name={showPassword ? "eye-off" : "eye"}
-                size={20}
-                color="#9ca3af"
-              />
-            </Pressable>
-          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Inserisci la tua password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
         </View>
 
         <Button
@@ -160,6 +160,17 @@ export default function LoginPage() {
           backgroundColor="#3b82f6"
           disabled={isLoading}
         />
+
+        {/* Backdoor Button - Solo in sviluppo */}
+        {backdoorEnabled && (
+          <Pressable 
+            onPress={handleShowBackdoorCredentials} 
+            style={styles.backdoorButton}
+          >
+            <Ionicons name="key" size={16} color="#dc2626" />
+            <Text style={styles.backdoorButtonText}>🔓 Credenziali Sviluppo</Text>
+          </Pressable>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -168,16 +179,18 @@ export default function LoginPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f9fafb',
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 16,
+    paddingBottom: 16,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
   },
   backButtonText: {
     marginLeft: 8,
@@ -222,32 +235,17 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
   },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  input: {
     borderWidth: 1,
     borderColor: '#d1d5db',
     borderRadius: 8,
-    backgroundColor: '#ffffff',
-  },
-  inputIcon: {
-    marginLeft: 12,
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    padding: 12,
     fontSize: 16,
-    color: '#111827',
-  },
-  passwordToggle: {
-    padding: 8,
-    marginRight: 8,
+    backgroundColor: 'white',
   },
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    backgroundColor: '#3b82f6',
+    padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 16,
@@ -256,45 +254,25 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#ffffff',
+    color: 'white',
     fontSize: 16,
-    fontWeight: '600',
-  },
-  forgotPassword: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    color: '#3b82f6',
-    fontSize: 14,
     fontWeight: '500',
   },
-  divider: {
+  backdoorButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    justifyContent: 'center',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#dc2626',
+    borderRadius: 8,
+    backgroundColor: '#fef2f2',
+    marginTop: 16,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#e5e7eb',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#9ca3af',
+  backdoorButtonText: {
+    marginLeft: 8,
+    color: '#dc2626',
     fontSize: 14,
-  },
-  footer: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  footerText: {
-    textAlign: 'center',
-    color: '#6b7280',
-    fontSize: 14,
-  },
-  footerLink: {
-    color: '#3b82f6',
     fontWeight: '500',
   },
 }); 
